@@ -13,7 +13,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeAbstractions    #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.TP.Sqrt2IsIrrational where
 

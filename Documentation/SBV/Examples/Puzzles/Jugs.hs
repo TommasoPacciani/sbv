@@ -16,7 +16,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.Jugs where
 

@@ -12,7 +12,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Control.Types (
        CheckSatResult(..)

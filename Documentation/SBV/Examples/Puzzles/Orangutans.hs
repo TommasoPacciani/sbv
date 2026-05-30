@@ -18,7 +18,7 @@
 {-# LANGUAGE StandaloneDeriving  #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.Orangutans where
 

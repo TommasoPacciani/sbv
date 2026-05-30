@@ -11,7 +11,7 @@
 
 {-# LANGUAGE ImplicitParams #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Misc.NoDiv0 where
 

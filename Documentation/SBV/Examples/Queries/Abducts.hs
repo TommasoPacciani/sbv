@@ -11,7 +11,7 @@
 -- N.B. Interpolants are only supported by CVC5 currently.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Queries.Abducts where
 

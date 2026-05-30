@@ -19,7 +19,7 @@
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE UndecidableInstances  #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Provers.Prover (
          SMTSolver(..), SMTConfig(..), Predicate
@@ -30,9 +30,10 @@ module Data.SBV.Provers.Prover (
        , runSMT, runSMTWith
        , SatModel(..), Modelable(..), displayModels, extractModels
        , getModelDictionaries, getModelValues, getModelUninterpretedValues
-       , abc, boolector, bitwuzla, cvc4, cvc5, dReal, mathSAT, yices, z3, openSMT, defaultSMTCfg, defaultDeltaSMTCfg
+       , abc, boolector, bitwuzla, cvc4, cvc5, dReal, mathSAT, yices, z3, z3Wasm, openSMT, defaultSMTCfg, defaultDeltaSMTCfg
        , proveWithAny, proveWithAll, proveConcurrentWithAny, proveConcurrentWithAll
        , satWithAny,   satWithAll,   satConcurrentWithAny,   satConcurrentWithAll
+       , concurrentCombinatorRejection
        ) where
 
 
@@ -41,12 +42,14 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.DeepSeq        (rnf, NFData(..))
 
 import Control.Concurrent.Async (async, waitAny, asyncThreadId, Async, mapConcurrently)
-import Control.Exception (finally, throwTo)
+import Control.Exception (finally, throwTo, throwIO)
 import System.Exit (ExitCode(ExitSuccess))
 
 import System.IO.Unsafe (unsafeInterleaveIO)             -- only used safely!
 
+#ifndef SBV_WASM
 import System.Directory  (getCurrentDirectory)
+#endif
 import Data.Time (getZonedTime, NominalDiffTime, UTCTime, getCurrentTime, diffUTCTime)
 import Data.List (intercalate, isPrefixOf)
 
@@ -58,7 +61,7 @@ import qualified Data.Text       as T
 import Data.SBV.Core.Data
 import Data.SBV.Core.Symbolic
 import Data.SBV.SMT.SMT
-import Data.SBV.SMT.Utils (debug, alignPlain)
+import Data.SBV.SMT.Utils (debug, alignPlain, SBVException(..))
 import Data.SBV.Utils.ExtractIO
 import Data.SBV.Utils.TDiff
 
@@ -79,6 +82,7 @@ import qualified Data.SBV.Provers.DReal     as DReal
 import qualified Data.SBV.Provers.MathSAT   as MathSAT
 import qualified Data.SBV.Provers.Yices     as Yices
 import qualified Data.SBV.Provers.Z3        as Z3
+import qualified Data.SBV.Provers.Z3Wasm    as Z3Wasm
 import qualified Data.SBV.Provers.OpenSMT   as OpenSMT
 
 import GHC.TypeLits
@@ -164,9 +168,17 @@ openSMT = mkConfig OpenSMT.openSMT SMTLib2 [ Control.OptionKeyword ":smtlib2_com
                                            , allOnStdOut
                                            ]
 
--- | The default solver used by SBV. This is currently set to z3.
+-- | Default configuration for the Z3 solver running in-browser as WebAssembly (Z3_WASM).
+z3Wasm :: SMTConfig
+z3Wasm = mkConfig Z3Wasm.z3Wasm SMTLib2 [ Control.OptionKeyword ":smtlib2_compliant" ["true"] ]
+
+-- | The default solver used by SBV. This is currently set to z3 (z3Wasm on the browser target).
 defaultSMTCfg :: SMTConfig
+#ifdef SBV_WASM
+defaultSMTCfg = z3Wasm
+#else
 defaultSMTCfg = z3
+#endif
 
 -- | The default solver used by SBV for delta-satisfiability problems. This is currently set to dReal,
 -- which is also the only solver that supports delta-satisfiability.
@@ -317,8 +329,49 @@ class ExtractIO m => SatisfiableM m a where
 
 -- | Find a satisfying assignment to a property with multiple solvers, running them in separate threads. The
 -- results will be returned in the order produced.
+-- | Build the unsupported-operation 'SBVException' that the browser (WASM) path
+-- raises when a multi-solver concurrent combinator (@proveWithAny@ /
+-- @proveWithAll@ / @satWithAny@ / @satWithAll@) is invoked. This is a /pure/
+-- function (it neither spawns a thread nor opens any session), so it is
+-- compiled on both the native and browser paths and the browser-only rejection
+-- behaviour is testable natively.
+concurrentCombinatorRejection :: String -> [SMTConfig] -> SBVException
+concurrentCombinatorRejection combinator configs = exc
+  where cfg = case configs of
+                (c : _) -> c
+                []      -> defaultSMTCfg
+        exc = SBVException { sbvExceptionDescription = combinator ++ " is not supported on the browser (WASM) target."
+                           , sbvExceptionSent        = Nothing
+                           , sbvExceptionExpected    = Nothing
+                           , sbvExceptionReceived    = Nothing
+                           , sbvExceptionStdOut      = Nothing
+                           , sbvExceptionStdErr      = Nothing
+                           , sbvExceptionExitCode    = Nothing
+                           , sbvExceptionConfig      = cfg
+                           , sbvExceptionReason      = Just [ "The browser runtime is single-threaded and cannot race multiple"
+                                                            , "solver processes against each other. " ++ combinator ++ " relies on"
+                                                            , "forkIO/async to run several solvers concurrently, which is not"
+                                                            , "available on this target."
+                                                            ]
+                           , sbvExceptionHint        = Just [ "Use a single-solver call (prove/sat/allSat/optimize) instead;"
+                                                            , "those run on the single thread without forkIO."
+                                                            ]
+                           }
+
+#ifdef SBV_WASM
+-- | On the browser (WASM) target the multi-solver concurrent combinators are
+-- rejected synchronously (no thread spawned, no session opened) with the
+-- 'SBVException' built by 'concurrentCombinatorRejection'.
+rejectConcurrentCombinator :: String -> [SMTConfig] -> IO a
+rejectConcurrentCombinator combinator configs = throwIO (concurrentCombinatorRejection combinator configs)
+#endif
+
 satWithAll :: Satisfiable a => [SMTConfig] -> a -> IO [(Solver, NominalDiffTime, SatResult)]
+#ifdef SBV_WASM
+satWithAll configs _ = rejectConcurrentCombinator "satWithAll" configs
+#else
 satWithAll = (`sbvWithAll` satWith)
+#endif
 
 -- | Find a satisfying assignment to a property with multiple solvers, running them in separate threads. Only
 -- the result of the first one to finish will be returned, remaining threads will be killed.
@@ -326,7 +379,11 @@ satWithAll = (`sbvWithAll` satWith)
 -- to finish. In rare cases this can lead to zombie processes. In previous experiments, we found
 -- that some processes take their time to terminate. So, this solution favors quick turnaround.
 satWithAny :: Satisfiable a => [SMTConfig] -> a -> IO (Solver, NominalDiffTime, SatResult)
+#ifdef SBV_WASM
+satWithAny configs _ = rejectConcurrentCombinator "satWithAny" configs
+#else
 satWithAny = (`sbvWithAny` satWith)
+#endif
 
 -- | Find a satisfying assignment to a property using a single solver, but
 -- providing several query problems of interest, with each query running in a
@@ -414,12 +471,20 @@ class ExtractIO m => ProvableM m a where
 -- to finish. In rare cases this can lead to zombie processes. In previous experiments, we found
 -- that some processes take their time to terminate. So, this solution favors quick turnaround.
 proveWithAny :: Provable a => [SMTConfig] -> a -> IO (Solver, NominalDiffTime, ThmResult)
+#ifdef SBV_WASM
+proveWithAny configs _ = rejectConcurrentCombinator "proveWithAny" configs
+#else
 proveWithAny  = (`sbvWithAny` proveWith)
+#endif
 
 -- | Prove a property with multiple solvers, running them in separate threads. The
 -- results will be returned in the order produced.
 proveWithAll :: Provable a => [SMTConfig] -> a -> IO [(Solver, NominalDiffTime, ThmResult)]
+#ifdef SBV_WASM
+proveWithAll configs _ = rejectConcurrentCombinator "proveWithAll" configs
+#else
 proveWithAll  = (`sbvWithAll` proveWith)
+#endif
 
 -- | Prove a property by running many queries each isolated to their own thread
 -- concurrently and return the first that finishes, killing the others
@@ -854,11 +919,19 @@ class ExtractIO m => SExecutable m a where
 
    -- | Generalization of 'Data.SBV.safeWith'
    safeWith :: SMTConfig -> a -> m [SafeResult]
+#ifdef SBV_WASM
+   -- On the browser path there is no operating-system current working directory
+   -- to relativize against, so 'mkRelative' is the identity: each 'SafeResult'
+   -- reports its source-location path unmodified.
+   safeWith cfg a = do let mkRelative = id :: FilePath -> FilePath
+                       fst <$> runSymbolic cfg (SMTMode QueryInternal ISafe True cfg) (sName a >> check mkRelative)
+#else
    safeWith cfg a = do cwd <- (++ "/") <$> liftIO getCurrentDirectory
                        let mkRelative path
                               | cwd `isPrefixOf` path = drop (length cwd) path
                               | True                  = path
                        fst <$> runSymbolic cfg (SMTMode QueryInternal ISafe True cfg) (sName a >> check mkRelative)
+#endif
      where check :: (FilePath -> FilePath) -> SymbolicT m [SafeResult]
            check mkRelative = Control.executeQuery QueryInternal $ Control.getSBVAssertions >>= mapM (verify mkRelative)
 

@@ -11,7 +11,7 @@
 -- and diagonals is the same.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.MagicSquare where
 

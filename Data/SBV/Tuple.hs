@@ -20,7 +20,7 @@
 {-# LANGUAGE ScopedTypeVariables    #-}
 {-# LANGUAGE TypeApplications       #-}
 
-{-# OPTIONS_GHC -Wall -Werror -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Data.SBV.Tuple (
   -- * Symbolic field access

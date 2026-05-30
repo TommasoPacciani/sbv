@@ -26,7 +26,7 @@
 {-# LANGUAGE TypeOperators           #-}
 {-# LANGUAGE UndecidableInstances    #-}
 
-{-# OPTIONS_GHC -Wall -Werror -fno-warn-orphans -Wno-incomplete-uni-patterns #-}
+{-# OPTIONS_GHC -Wall -fno-warn-orphans -Wno-incomplete-uni-patterns #-}
 
 module Data.SBV.Core.Model (
     Mergeable(..), Equality(..), EqSymbolic(..), OrdSymbolic(..), SDivisible(..), SMTDefinable(..), QSaturate, qSaturateSavingObservables

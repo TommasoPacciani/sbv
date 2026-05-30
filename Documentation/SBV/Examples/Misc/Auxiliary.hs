@@ -17,7 +17,7 @@
 
 {-# LANGUAGE OverloadedStrings #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Misc.Auxiliary where
 

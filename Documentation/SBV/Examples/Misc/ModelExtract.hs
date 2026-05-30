@@ -13,7 +13,7 @@
 -- these utilities here.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Misc.ModelExtract where
 

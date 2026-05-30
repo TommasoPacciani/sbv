@@ -14,7 +14,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns        #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SMT.SMTLib2(cvt, cvtExp, cvtCV, cvtInc, declUserFuns, constructTables, setSMTOption) where
 

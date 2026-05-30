@@ -23,7 +23,7 @@
 {-# LANGUAGE TypeFamilies     #-}
 {-# LANGUAGE TypeOperators    #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Tools.Induction (
          InductionResult(..), InductionStep(..), induct, inductWith

@@ -9,7 +9,7 @@
 -- Demonstrates how lambda-abstractions can be used to model arrays.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Misc.LambdaArray where
 

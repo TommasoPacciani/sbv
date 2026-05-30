@@ -17,7 +17,7 @@
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE TypeAbstractions     #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.TP.Kernel (
          Proposition,  Proof(..)

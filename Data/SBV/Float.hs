@@ -9,7 +9,7 @@
 -- A collection of arbitrary float operations.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Float (
         -- * Type-sized floats

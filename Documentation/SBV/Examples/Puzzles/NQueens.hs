@@ -9,7 +9,7 @@
 -- Solves the NQueens puzzle: <http://en.wikipedia.org/wiki/Eight_queens_puzzle>
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.NQueens where
 

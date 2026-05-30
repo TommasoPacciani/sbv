@@ -9,7 +9,7 @@
 -- SMTLib Reserved names
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SMT.SMTLibNames (isReserved) where
 

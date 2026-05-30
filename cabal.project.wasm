@@ -1,0 +1,62 @@
+-- WASM-ONLY cabal project. NOT auto-loaded by cabal (only `cabal.project` is),
+-- so native builds are unaffected. Pass it explicitly:
+--
+--   PATH="$HOME/.local/bin:$PATH" cabal --project-file=cabal.project.wasm \
+--     --with-compiler=$HOME/.ghcup/bin/wasm32-wasi-ghc-9.15 \
+--     --with-hc-pkg=$HOME/.ghcup/bin/wasm32-wasi-ghc-pkg-9.15 \
+--     --with-hsc2hs=$HOME/.ghcup/bin/wasm32-wasi-hsc2hs-9.15 \
+--     --with-happy=$HOME/.local/bin/happy \
+--     --builddir=dist-wasm \
+--     build lib:sbv
+--
+-- Prerequisites (one-time):
+--   * wasm32-wasi GHC 9.15 (ghcup) AND its wasi-sdk at ~/.ghc-wasm/wasi-sdk
+--     (provides wasm32-wasi-clang; ghc-wasm-meta's setup installs it).
+--   * a host-runnable `happy` (e.g. `cabal install happy --installdir ~/.local/bin`).
+--
+-- It adds the head.hackage overlay (patched packages that build with the GHC
+-- wasm nightly) and the boot-package allow-newer/installed constraints.
+packages: .
+
+optimization: False
+
+-- Template Haskell on the wasm target loads dependency code through GHC's
+-- JS-based dynamic linker (dyld.mjs), which needs shared libraries. SBV and
+-- several deps use TH, so shared objects are mandatory here.
+shared: True
+library-for-ghci: False
+
+repository head.hackage.ghc.haskell.org
+  url: https://ghc.gitlab.haskell.org/head.hackage/
+  secure: True
+  key-threshold: 3
+  root-keys:
+    7541f32a4ccca4f97aea3b22f5e593ba2c0267546016b992dfadcd2fe944e55d
+    26021a13b401500c8eb2761ca95c61f2d625bfef951b939a8124ed12ecf07329
+    f76d08be13e9a61a377a85e2fb63f4c5435d40f8feb3e12eb05905edb8cdea89
+
+active-repositories: hackage.haskell.org, head.hackage.ghc.haskell.org:override
+
+allow-newer:
+  all:Cabal, all:Cabal-syntax, all:array, all:base, all:binary, all:bytestring,
+  all:containers, all:deepseq, all:directory, all:exceptions, all:filepath,
+  all:ghc, all:ghc-bignum, all:ghc-boot, all:ghc-boot-th, all:ghc-compact,
+  all:ghc-experimental, all:ghc-heap, all:ghc-internal, all:ghc-platform,
+  all:ghc-prim, all:ghc-toolchain, all:ghci, all:haskeline, all:hpc,
+  all:integer-gmp, all:mtl, all:os-string, all:parsec, all:pretty, all:process,
+  all:rts, all:semaphore-compat, all:stm, all:system-cxx-std-lib,
+  all:template-haskell, all:text, all:time, all:transformers, all:unix, all:xhtml
+
+constraints:
+  Cabal installed, Cabal-syntax installed, array installed, base installed,
+  binary installed, bytestring installed, containers installed, deepseq installed,
+  directory installed, exceptions installed, filepath installed, ghc installed,
+  ghc-bignum installed, ghc-boot installed, ghc-boot-th installed,
+  ghc-compact installed, ghc-experimental installed, ghc-heap installed,
+  ghc-internal installed, ghc-platform installed, ghc-prim installed,
+  ghc-toolchain installed, ghci installed, haskeline installed, hpc installed,
+  integer-gmp installed, mtl installed, os-string installed, parsec installed,
+  pretty installed, process installed, rts installed, semaphore-compat installed,
+  stm installed, system-cxx-std-lib installed, template-haskell installed,
+  text installed, time installed, transformers installed, unix installed,
+  xhtml installed

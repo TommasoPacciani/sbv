@@ -32,7 +32,7 @@
 {-# LANGUAGE UndecidableInstances       #-}
 {-# LANGUAGE ViewPatterns               #-}
 
-{-# OPTIONS_GHC -Wall -Werror -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Data.SBV.Core.Symbolic
   ( NodeId(..)

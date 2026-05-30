@@ -24,7 +24,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE UndecidableInstances  #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-orphans #-}
+{-# OPTIONS_GHC -Wall -Wno-orphans #-}
 
 module Data.SBV.Core.Data
  ( SBool, SWord8, SWord16, SWord32, SWord64

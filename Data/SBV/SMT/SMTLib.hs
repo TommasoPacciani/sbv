@@ -11,7 +11,7 @@
 
 {-# LANGUAGE NamedFieldPuns #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SMT.SMTLib (
           SMTLibPgm

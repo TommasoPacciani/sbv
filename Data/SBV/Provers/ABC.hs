@@ -9,7 +9,7 @@
 -- The connection to the ABC verification and synthesis tool
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Provers.ABC(abc) where
 

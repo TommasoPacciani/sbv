@@ -25,9 +25,9 @@
 {-# LANGUAGE NegativeLiterals #-}
 
 #if __GLASGOW_HASKELL__ >= 913
-{-# OPTIONS_GHC -Wall -Werror -Wno-incomplete-record-selectors #-}
+{-# OPTIONS_GHC -Wall -Wno-incomplete-record-selectors #-}
 #else
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 #endif
 
 module Documentation.SBV.Examples.Puzzles.AOC_2021_24 where

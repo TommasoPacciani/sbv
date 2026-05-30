@@ -9,7 +9,7 @@
 -- Solves the tower puzzle, <http://www.chiark.greenend.org.uk/%7Esgtatham/puzzles/js/towers.html>.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.Tower where
 

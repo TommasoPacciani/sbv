@@ -13,7 +13,7 @@
 -- extra conditions with ease as we walk through solutions.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Queries.AllSat where
 

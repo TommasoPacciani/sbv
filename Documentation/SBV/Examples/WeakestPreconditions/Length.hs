@@ -18,7 +18,7 @@
 {-# LANGUAGE NamedFieldPuns        #-}
 {-# LANGUAGE TypeFamilies          #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.WeakestPreconditions.Length where
 

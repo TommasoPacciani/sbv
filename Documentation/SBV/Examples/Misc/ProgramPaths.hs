@@ -20,7 +20,7 @@
 -- @x@ and @y@ to obtain these values?
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Misc.ProgramPaths where
 

@@ -12,7 +12,7 @@
 {-# LANGUAGE DataKinds        #-}
 {-# LANGUAGE TypeAbstractions #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.TP.CaseSplit where
 

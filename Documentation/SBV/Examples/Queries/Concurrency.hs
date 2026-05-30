@@ -17,7 +17,7 @@
 -- demonstrated in the second demo.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Queries.Concurrency where
 

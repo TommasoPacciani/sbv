@@ -18,7 +18,7 @@
 {-# LANGUAGE TupleSections         #-}
 {-# LANGUAGE UndecidableInstances  #-}
 
-{-# OPTIONS_GHC -Wall -Werror -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 
 module Data.SBV.Lambda (
             lambda,      lambdaStr

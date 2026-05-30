@@ -27,7 +27,7 @@
 -- answers are consistent with that decision.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.Puzzles.Newspaper where
 

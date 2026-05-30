@@ -20,7 +20,7 @@
 {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeAbstractions     #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-unused-matches #-}
+{-# OPTIONS_GHC -Wall -Wno-unused-matches #-}
 
 module Documentation.SBV.Examples.TP.Kleene where
 

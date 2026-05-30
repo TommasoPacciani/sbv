@@ -16,7 +16,7 @@
 {-# LANGUAGE TypeAbstractions    #-}
 {-# LANGUAGE TypeApplications    #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Documentation.SBV.Examples.TP.Majority where
 

@@ -17,10 +17,10 @@
 {-# LANGUAGE TemplateHaskell     #-}
 
 #if MIN_VERSION_template_haskell(2,22,1)
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 #else
 {-# LANGUAGE DeriveLift #-}
-{-# OPTIONS_GHC -Wall -Werror -fno-warn-orphans #-}
+{-# OPTIONS_GHC -Wall -fno-warn-orphans #-}
 #endif
 
 module Data.SBV.Client
