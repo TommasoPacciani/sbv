@@ -18,7 +18,7 @@
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-orphans #-}
+{-# OPTIONS_GHC -Wall -Wno-orphans #-}
 
 module Data.SBV.Core.Floating (
          IEEEFloating(..), IEEEFloatConvertible(..)

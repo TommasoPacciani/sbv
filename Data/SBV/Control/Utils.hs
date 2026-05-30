@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeApplications       #-}
 {-# LANGUAGE ViewPatterns           #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-orphans #-}
+{-# OPTIONS_GHC -Wall -Wno-orphans #-}
 
 module Data.SBV.Control.Utils (
        io

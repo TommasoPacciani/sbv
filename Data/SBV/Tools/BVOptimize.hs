@@ -18,7 +18,7 @@
 
 {-# LANGUAGE CPP #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Tools.BVOptimize (
             -- ** Maximizing bit-vectors

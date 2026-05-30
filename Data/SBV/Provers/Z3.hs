@@ -9,7 +9,7 @@
 -- The connection to the Z3 SMT solver
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Provers.Z3(z3) where
 

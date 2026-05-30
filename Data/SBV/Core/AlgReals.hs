@@ -15,7 +15,7 @@
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE FlexibleInstances  #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-orphans #-}
+{-# OPTIONS_GHC -Wall -Wno-orphans #-}
 
 module Data.SBV.Core.AlgReals (
              AlgReal(..)

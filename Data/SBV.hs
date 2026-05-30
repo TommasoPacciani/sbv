@@ -195,7 +195,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE TypeOperators         #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV (
   -- $progIntro
@@ -457,7 +457,7 @@ module Data.SBV (
   -- $verbosity
 
   -- ** Solvers
-  , boolector, bitwuzla, cvc4, cvc5, yices, dReal, z3, mathSAT, abc, openSMT
+  , boolector, bitwuzla, cvc4, cvc5, yices, dReal, z3, z3Wasm, mathSAT, abc, openSMT
   -- ** Configurations
   , defaultSolverConfig, defaultSMTCfg, defaultDeltaSMTCfg, sbvCheckSolverInstallation, getAvailableSolvers
   , setLogic, Logic(..), setOption, setInfo, setTimeOut

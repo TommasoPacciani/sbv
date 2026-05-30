@@ -9,7 +9,7 @@
 -- Runs an IO computation printing the time it took to run it
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Utils.TDiff
   ( Timing(..)

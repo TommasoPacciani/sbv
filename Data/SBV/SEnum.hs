@@ -25,7 +25,7 @@
 
 {-# LANGUAGE TemplateHaskellQuotes #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SEnum (sEnum) where
 

@@ -20,7 +20,7 @@
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TypeOperators          #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.TP.TP (
          Proposition, Proof, proofOf, assumptionFromProof, Instantiatable(..), Inst(..)

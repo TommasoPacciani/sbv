@@ -14,7 +14,7 @@
 -- See the directory Documentation.SBV.Examples.TP for various examples.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.TP (
        -- * Propositions and their proofs

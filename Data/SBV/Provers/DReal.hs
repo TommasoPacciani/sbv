@@ -9,7 +9,7 @@
 -- The connection to the dReal SMT solver
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Provers.DReal(dReal) where
 

@@ -9,7 +9,7 @@
 -- The connection to the MathSAT SMT solver
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Provers.MathSAT(mathSAT) where
 

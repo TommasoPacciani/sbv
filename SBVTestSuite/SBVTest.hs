@@ -133,6 +133,8 @@ import qualified TestSuite.Uninterpreted.EUFLogic
 import qualified TestSuite.Uninterpreted.Function
 import qualified TestSuite.Uninterpreted.Sort
 import qualified TestSuite.Uninterpreted.Uninterpreted
+import qualified TestSuite.Wasm.SafeWithPaths
+import qualified TestSuite.Wasm.ConcurrentRejection
 
 main :: IO ()
 main = do sCaseTests <- TestSuite.CompileTests.SCase.tests
@@ -256,6 +258,8 @@ main = do sCaseTests <- TestSuite.CompileTests.SCase.tests
                       , TestSuite.Uninterpreted.Sort.tests
                       , TestSuite.Uninterpreted.Uninterpreted.tests
                       , TestSuite.Uninterpreted.EUFLogic.tests
+                      , TestSuite.Wasm.SafeWithPaths.tests
+                      , TestSuite.Wasm.ConcurrentRejection.tests
                       , sCaseTests
                       , pCaseTests
                       ]

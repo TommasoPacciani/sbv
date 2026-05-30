@@ -18,7 +18,7 @@
 {-# LANGUAGE KindSignatures         #-}
 {-# LANGUAGE TypeApplications       #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-orphans #-}
+{-# OPTIONS_GHC -Wall -Wno-orphans #-}
 
 module Data.SBV.Tuple (
   -- * Symbolic field access

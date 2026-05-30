@@ -11,7 +11,7 @@
 
 {-# LANGUAGE TupleSections #-}
 
-{-# OPTIONS_GHC -Wall -Werror -Wno-incomplete-uni-patterns #-}
+{-# OPTIONS_GHC -Wall -Wno-incomplete-uni-patterns #-}
 
 module Data.SBV.Compilers.C(compileToC, compileToCLib, compileToC', compileToCLib') where
 

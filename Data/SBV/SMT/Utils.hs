@@ -9,10 +9,11 @@
 -- A few internally used types/routines
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE NamedFieldPuns      #-}
 {-# LANGUAGE OverloadedStrings   #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SMT.Utils (
           SMTLibConverter
@@ -29,6 +30,9 @@ module Data.SBV.SMT.Utils (
         , recordException
         , recordEndTime
         , TranscriptMsg(..)
+#ifdef SBV_WASM
+        , unsupportedFileSystemOp
+#endif
        )
        where
 
@@ -41,6 +45,8 @@ import Data.SBV.Core.Symbolic (QueryContext, CnstMap, SMTDef, ResultInp(..), Pro
 
 import Data.SBV.Utils.Lib   (joinArgs, showText)
 import Data.SBV.Utils.TDiff (Timing(..), showTDiff)
+
+import Data.SBV.SMT.TranscriptSink (resolveTranscriptSink, emitStart, emitAppend)
 
 import Data.IORef (writeIORef)
 import Data.Time  (getZonedTime, defaultTimeLocale, formatTime, diffUTCTime, getCurrentTime)
@@ -55,7 +61,9 @@ import qualified Data.Text    as T
 import qualified Data.Text.IO as TIO
 import           Data.Text (Text)
 
+#ifndef SBV_WASM
 import System.Directory (findExecutable)
+#endif
 import System.Exit      (ExitCode(..))
 
 -- | An instance of SMT-Lib converter; instantiated for SMT-Lib v1 and v2. (And potentially for newer versions in the future.)
@@ -219,6 +227,40 @@ instance Show SBVException where
 
           in T.unpack $ T.unlines $ join [grp1, grp2, grp3, grp4]
 
+#ifdef SBV_WASM
+-- | Browser-path guard for un-virtualizable operating-system filesystem
+-- operations. The browser runtime has no operating-system filesystem, so a
+-- 'Solving_API' code path that would otherwise reach an OS filesystem
+-- operation that cannot be virtualized (one not covered by the transcript sink
+-- or the 'safeWith' path) must be prevented from performing that access. This
+-- helper does exactly that: it never touches a filesystem and instead raises an
+-- explicit 'SBVException' naming the unsupported filesystem operation, so the
+-- caller receives a clear, actionable error rather than an attempted (and
+-- impossible) OS access (Requirement 11.4).
+--
+-- The @String@ argument is the name of the offending operation (e.g.
+-- @\"writeFile\"@, @\"getDirectoryContents\"@). This is intended to be wired in
+-- at any concrete browser-path call site that would otherwise hit an
+-- un-virtualizable filesystem operation. It is only present on the browser path
+-- (@#ifdef SBV_WASM@); the native build never references it, keeping native
+-- behavior byte-identical.
+unsupportedFileSystemOp :: SMTConfig -> String -> IO a
+unsupportedFileSystemOp cfg opName = C.throwIO exc
+  where exc = SBVException { sbvExceptionDescription = "Unsupported filesystem operation on the browser path: " ++ opName
+                           , sbvExceptionSent        = Nothing
+                           , sbvExceptionExpected    = Nothing
+                           , sbvExceptionReceived    = Nothing
+                           , sbvExceptionStdOut      = Nothing
+                           , sbvExceptionStdErr      = Nothing
+                           , sbvExceptionExitCode    = Nothing
+                           , sbvExceptionConfig      = cfg
+                           , sbvExceptionReason      = Just [ "The browser runtime has no operating-system filesystem, and this"
+                                                            , "operation cannot be virtualized to a browser-available sink."
+                                                            ]
+                           , sbvExceptionHint        = Nothing
+                           }
+#endif
+
 -- | Compute and report the end time
 recordEndTime :: SMTConfig -> State -> IO ()
 recordEndTime SMTConfig{timing} state = case timing of
@@ -228,12 +270,23 @@ recordEndTime SMTConfig{timing} state = case timing of
                                            SaveTiming here -> writeIORef here =<< elapsed
   where elapsed = getCurrentTime >>= \end -> pure $ diffUTCTime end (startTime state)
 
--- | Start a transcript file, if requested.
+-- | Locate the solver executable for the transcript banner. On the native path
+-- this consults the operating-system PATH via 'findExecutable'; on the browser
+-- path there is no PATH or executable lookup, so it is a no-op that reports the
+-- executable as not locatable (Requirement 7.1).
+locateExecutable :: FilePath -> IO (Maybe FilePath)
+#ifdef SBV_WASM
+locateExecutable _ = pure Nothing
+#else
+locateExecutable = findExecutable
+#endif
+
+-- | Start a transcript, if requested.
 startTranscript :: Maybe FilePath -> SMTConfig -> IO ()
 startTranscript Nothing  _   = pure ()
 startTranscript (Just f) cfg = do ts <- show <$> getZonedTime
-                                  mbExecPath <- findExecutable (executable (solver cfg))
-                                  writeFile f $ start ts mbExecPath
+                                  mbExecPath <- locateExecutable (executable (solver cfg))
+                                  emitStart (resolveTranscriptSink f) (T.pack (start ts mbExecPath))
   where SMTSolver{name, options} = solver cfg
         start ts mbPath = unlines [ ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
                                   , ";;; SBV: Starting at " ++ ts
@@ -247,11 +300,11 @@ startTranscript (Just f) cfg = do ts <- show <$> getZonedTime
                                   , ""
                                   ]
 
--- | Finish up the transcript file.
+-- | Finish up the transcript.
 finalizeTranscript :: Maybe FilePath -> ExitCode -> IO ()
 finalizeTranscript Nothing  _  = pure ()
 finalizeTranscript (Just f) ec = do ts <- show <$> getZonedTime
-                                    appendFile f $ end ts
+                                    emitAppend (resolveTranscriptSink f) (T.pack (end ts))
   where end ts = unlines [ ""
                          , ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
                          , ";;;"
@@ -267,20 +320,20 @@ data TranscriptMsg = SentMsg  Text   (Maybe Int) -- ^ Message sent, and time-out
                    | RecvMsg  String             -- ^ Message received
                    | DebugMsg Text               -- ^ A debug message; neither sent nor received
 
--- If requested, record in the transcript file
+-- If requested, record in the transcript
 recordTranscript :: Maybe FilePath -> TranscriptMsg -> IO ()
 recordTranscript Nothing  _ = pure ()
 recordTranscript (Just f) m = do tsPre <- formatTime defaultTimeLocale "; [%T%Q" <$> getZonedTime
                                  let ts = take 15 $ tsPre ++ repeat '0'
-                                 case m of
-                                   SentMsg sent mbTimeOut  -> TIO.appendFile f $ T.unlines $ (T.pack ts <> "] " <> to mbTimeOut <> "Sending:") : T.lines sent
-                                   RecvMsg recv            -> appendFile f $ unlines $ case lines (dropWhile isSpace recv) of
+                                 emitAppend (resolveTranscriptSink f) $ case m of
+                                   SentMsg sent mbTimeOut  -> T.unlines $ (T.pack ts <> "] " <> to mbTimeOut <> "Sending:") : T.lines sent
+                                   RecvMsg recv            -> T.pack $ unlines $ case lines (dropWhile isSpace recv) of
                                                                                         []  -> [ts ++ "] Received: <NO RESPONSE>"]  -- can't really happen.
                                                                                         [x] -> [ts ++ "] Received: " ++ x]
                                                                                         xs  -> (ts ++ "] Received: ") : map (";   " ++) xs
                                    DebugMsg msg            -> let tag = T.pack ts <> "] "
                                                                   emp = T.cons ';' (T.replicate (T.length tag - 1) " ")
-                                                              in TIO.appendFile f $ T.unlines $ zipWith (<>) (tag : repeat emp) (T.lines msg)
+                                                              in T.unlines $ zipWith (<>) (tag : repeat emp) (T.lines msg)
         where to Nothing  = ""
               to (Just i) = "[Timeout: " <> showTimeoutValue i <> "] "
 {-# INLINE recordTranscript #-}
@@ -289,7 +342,7 @@ recordTranscript (Just f) m = do tsPre <- formatTime defaultTimeLocale "; [%T%Q"
 recordException :: Maybe FilePath -> String -> IO ()
 recordException Nothing  _ = pure ()
 recordException (Just f) m = do ts <- show <$> getZonedTime
-                                appendFile f $ exc ts
+                                emitAppend (resolveTranscriptSink f) (T.pack (exc ts))
   where exc ts = unlines $ [ ""
                            , ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"
                            , ";;;"

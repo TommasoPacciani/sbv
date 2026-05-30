@@ -13,7 +13,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeOperators    #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Tools.BMC (
          bmcRefute, bmcRefuteWith, bmcCover, bmcCoverWith

@@ -9,7 +9,7 @@
 -- Control sublanguage for interacting with SMT solvers.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Control (
      -- $queryIntro

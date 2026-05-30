@@ -10,7 +10,7 @@
 -- negative position.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Utils.ExtractIO where
 

@@ -98,6 +98,23 @@ Library
   if flag(doctest_is_running)
     CPP-Options: -DDOCTEST
 
+  -- Dual-target build configuration (Requirement 12). On the WebAssembly
+  -- (browser) target we select the in-browser solver engine via -DSBV_WASM and
+  -- drop the operating-system modules the native process engine needs
+  -- (process, directory). libBF is retained on BOTH targets: its bundled
+  -- portable C sources are compiled by the wasm clang toolchain, so SBV's
+  -- arbitrary-precision/IEEE floating-point type stays present in the browser
+  -- build (Requirement 10). On the native target the dependency set and
+  -- behavior are exactly as before.
+  if arch(wasm32)
+    CPP-Options: -DSBV_WASM
+    -- GHC.Wasm.Prim (the JSFFI types used by Data.SBV.SMT.WasmBridge) lives in
+    -- the ghc-experimental package on the WebAssembly backend.
+    build-depends: ghc-experimental
+  else
+    build-depends: directory
+                 , process
+
   default-language: Haskell2010
   build-depends   : QuickCheck
                   , array
@@ -107,14 +124,12 @@ Library
                   , cryptohash-sha512
                   , containers
                   , deepseq
-                  , directory
                   , filepath
                   , haskell-src-exts
                   , haskell-src-meta
                   , libBF
                   , mtl
                   , pretty
-                  , process
                   , random
                   , syb
                   , template-haskell
@@ -130,6 +145,7 @@ Library
                   , Data.SBV.Either
                   , Data.SBV.Float
                   , Data.SBV.Internals
+                  , Data.SBV.SMT.WasmBridge
                   , Data.SBV.List
                   , Data.SBV.Maybe
                   , Data.SBV.Rational
@@ -315,10 +331,12 @@ Library
                   , Data.SBV.Lambda
                   , Data.SBV.SCase
                   , Data.SBV.SEnum
+                  , Data.SBV.SMT.BrowserEngine
                   , Data.SBV.SMT.SMT
                   , Data.SBV.SMT.SMTLib
                   , Data.SBV.SMT.SMTLib2
                   , Data.SBV.SMT.SMTLibNames
+                  , Data.SBV.SMT.TranscriptSink
                   , Data.SBV.SMT.Utils
                   , Data.SBV.Provers.Prover
                   , Data.SBV.Provers.ABC
@@ -331,6 +349,7 @@ Library
                   , Data.SBV.Provers.OpenSMT
                   , Data.SBV.Provers.Yices
                   , Data.SBV.Provers.Z3
+                  , Data.SBV.Provers.Z3Wasm
                   , Data.SBV.Utils.CrackNum
                   , Data.SBV.Utils.ExtractIO
                   , Data.SBV.Utils.Numeric
@@ -341,6 +360,23 @@ Library
                   , Data.SBV.TP.Kernel
                   , Data.SBV.TP.TP
                   , Data.SBV.TP.Utils
+
+-- Browser (WebAssembly) demo entry point. This component is built ONLY for the
+-- wasm32 target (it uses the GHC WebAssembly JSFFI, which a native GHC does not
+-- provide), so it is marked unbuildable elsewhere and therefore never affects
+-- native builds. Build it with the wasm cross compiler, then post-link it:
+--   $(wasm32-wasi-ghc --print-libdir)/post-link.mjs -i sbv-wasm-demo.wasm -o sbv-wasm-demo.js
+-- See web/README.md for the full browser-run instructions.
+Executable sbv-wasm-demo
+  import           : common-settings
+  default-language : Haskell2010
+  hs-source-dirs   : wasm
+  main-is          : Main.hs
+  if arch(wasm32)
+    build-depends : sbv, ghc-experimental
+    ghc-options   : -no-hs-main -optl-mexec-model=reactor -optl-Wl,--export=hs_init
+  else
+    buildable: False
 
 Test-Suite SBVTest
   import           : common-settings
@@ -363,9 +399,11 @@ Test-Suite SBVTest
                   , tasty-hunit
                   , tasty-quickcheck
                   , temporary
+                  , text
   hs-source-dirs  : SBVTestSuite
   main-is         : SBVTest.hs
   other-modules   : Utils.SBVTestFramework
+                  , Utils.MockBridge
                   , TestSuite.ADT.ADT
                   , TestSuite.ADT.Expr
                   , TestSuite.ADT.MutRec
@@ -484,6 +522,8 @@ Test-Suite SBVTest
                   , TestSuite.Uninterpreted.Uninterpreted
                   , TestSuite.Uninterpreted.EUFLogic
                   , TestSuite.CantTypeCheck.Misc
+                  , TestSuite.Wasm.SafeWithPaths
+                  , TestSuite.Wasm.ConcurrentRejection
 
 Test-Suite SBVConnections
     import          : common-settings

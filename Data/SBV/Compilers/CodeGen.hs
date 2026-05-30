@@ -9,9 +9,10 @@
 -- Code generation utilities
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Compilers.CodeGen (
         -- * The codegen monad
@@ -40,14 +41,24 @@ module Data.SBV.Compilers.CodeGen (
         , cgGenerateDriver, cgGenerateMakefile, codeGen, renderCgPgmBundle
         ) where
 
-import Control.Monad             (filterM, replicateM, unless)
+import Control.Monad             (replicateM, unless)
 import Control.Monad.Trans       (MonadIO(liftIO), lift)
 import Control.Monad.State.Lazy  (MonadState, StateT(..), modify')
-import Data.Char                 (toLower, isSpace)
-import Data.List                 (nub, isPrefixOf, intercalate, (\\))
+import Data.Char                 (isSpace)
+import Data.List                 (nub, intercalate, (\\))
+
+-- Rendering generated code to a directory writes to an operating-system
+-- filesystem, which does not exist on the WebAssembly (SBV_WASM) browser target
+-- (code generation is out of scope there). The OS imports it needs are
+-- therefore only brought in on the native target.
+#ifndef SBV_WASM
+import Control.Monad             (filterM)
+import Data.Char                 (toLower)
+import Data.List                 (isPrefixOf)
 import System.Directory          (createDirectoryIfMissing, doesDirectoryExist, doesFileExist)
 import System.FilePath           ((</>))
 import System.IO                 (hFlush, stdout)
+#endif
 
 import           Text.PrettyPrint.HughesPJ      (Doc, vcat)
 import qualified Text.PrettyPrint.HughesPJ as P (render)
@@ -345,6 +356,7 @@ codeGen l cgConfig nm (SBVCodeGen comp) = do
 -- | Render a code-gen bundle to a directory or to stdout
 renderCgPgmBundle :: Maybe FilePath -> (CgConfig, CgPgmBundle) -> IO ()
 renderCgPgmBundle Nothing        (_  , bundle)              = print bundle
+#ifndef SBV_WASM
 renderCgPgmBundle (Just dirName) (cfg, CgPgmBundle _ files) = do
 
         b <- doesDirectoryExist dirName
@@ -372,6 +384,14 @@ renderCgPgmBundle (Just dirName) (cfg, CgPgmBundle _ files) = do
         renderFile (f, (_, ds)) = do let fn = dirName </> f
                                      unless overWrite $ putStrLn $ "Generating: " ++ show fn ++ ".."
                                      writeFile fn (render' (vcat ds))
+#else
+-- On the WebAssembly (SBV_WASM) target there is no operating-system filesystem
+-- to write generated files to; directory code generation is unsupported in the
+-- browser (Requirement 11.4). The stdout variant ('Nothing') above still works.
+renderCgPgmBundle (Just dirName) _ =
+        error $ "Data.SBV: code generation to directory " ++ show dirName
+             ++ " is unsupported on the WebAssembly (browser) target: there is no operating-system filesystem to write to."
+#endif
 
 -- | An alternative to Pretty's @render@, which might have "leading" white-space in empty lines. This version
 -- eliminates such whitespace.

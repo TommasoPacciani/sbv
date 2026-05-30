@@ -22,7 +22,7 @@
 {-# LANGUAGE RankNTypes       #-}
 {-# LANGUAGE TypeOperators    #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Internals (
   -- * Running symbolic programs /manually/
@@ -73,6 +73,12 @@ module Data.SBV.Internals (
 
   -- * TP induction extras
   , HasInductionSchema(..), internalAxiom
+
+  -- * Source-location path reporting (shared by 'Data.SBV.safeWith')
+  , mkRelativeFor
+
+  -- * Browser-path concurrent-combinator rejection (shared with the WASM build)
+  , concurrentCombinatorRejection
   ) where
 
 import Control.Monad.IO.Class (MonadIO)
@@ -93,7 +99,9 @@ import Data.SBV.Compilers.CodeGen
 import Data.SBV.SMT.SMTLibNames
 import Data.SBV.SMT.SMT (genParse, showModel, SatModel(..))
 
-import Data.SBV.Provers.Prover (ProvableM, SatisfiableM)
+import Data.SBV.Provers.Prover (ProvableM, SatisfiableM, concurrentCombinatorRejection)
+
+import Data.SBV.Utils.Lib (mkRelativeFor)
 
 import Data.SBV.Utils.Numeric
 

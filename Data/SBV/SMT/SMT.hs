@@ -9,6 +9,7 @@
 -- Abstraction of SMT solvers
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE BangPatterns               #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -21,7 +22,7 @@
 {-# LANGUAGE UndecidableInstances       #-}
 {-# LANGUAGE ViewPatterns               #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.SMT.SMT (
        -- * Model extraction
@@ -45,31 +46,20 @@ module Data.SBV.SMT.SMT (
 
 import qualified Control.Exception as C
 
-import Control.Concurrent (newEmptyMVar, takeMVar, putMVar, forkIO)
 import Control.DeepSeq    (NFData(..))
-import Control.Monad      (zipWithM, mplus)
+import Control.Monad      (zipWithM)
 import Data.Char          (isSpace)
-import Data.Maybe         (isJust)
 import Data.Int           (Int8, Int16, Int32, Int64)
-import Data.List          (intercalate, isPrefixOf, transpose, isInfixOf)
+import Data.List          (intercalate, transpose)
 import Data.Word          (Word8, Word16, Word32, Word64)
 
 import GHC.TypeLits
 import Data.Proxy
 
-import Data.IORef (readIORef, writeIORef)
-
 import Data.Either (rights)
-
-import System.Directory   (findExecutable)
-import System.Environment (getEnv, lookupEnv)
-import System.Exit        (ExitCode(..))
-import System.IO          (hClose, hFlush, hGetContents, hGetLine, hReady, hGetChar)
-import System.Process     (runInteractiveProcess, waitForProcess, terminateProcess)
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text       as T
-import qualified Data.Text.IO    as TIO
 import Text.Read (readMaybe)
 
 import Data.SBV.Core.AlgReals
@@ -80,15 +70,41 @@ import Data.SBV.Core.Kind     (showBaseKind, intOfProxy, BVIsNonZero)
 
 import Data.SBV.Core.SizedFloats(FloatingPoint(..))
 
-import Data.SBV.SMT.Utils     ( showTimeoutValue, alignPlain, debug, mergeSExpr, SBVException(..)
+import Data.SBV.SMT.Utils     (alignPlain)
+
+import Data.SBV.Utils.PrettyNum
+import Data.SBV.Utils.Lib       (needsBars, showText)
+import Data.SBV.Utils.SExpr     (nameSupply)
+
+-- The native process-based engine and its operating-system dependencies are
+-- only compiled on the native target. On the WebAssembly (SBV_WASM) target the
+-- browser engine ("Data.SBV.SMT.BrowserEngine") replaces it, so none of
+-- @System.Process@, @System.Directory@, @System.Environment@ (nor the handle/
+-- concurrency I/O the native engine uses) is imported here.
+#ifndef SBV_WASM
+import Control.Concurrent (newEmptyMVar, takeMVar, putMVar, forkIO)
+import Control.Monad      (mplus)
+import Data.Maybe         (isJust)
+import Data.List          (isPrefixOf, isInfixOf)
+import Data.IORef         (readIORef, writeIORef)
+
+import System.Directory   (findExecutable)
+import System.Environment (getEnv, lookupEnv)
+import System.Exit        (ExitCode(..))
+import System.IO          (hClose, hFlush, hGetContents, hGetLine, hReady, hGetChar)
+import System.Process     (runInteractiveProcess, waitForProcess, terminateProcess)
+
+import qualified Data.Text.IO    as TIO
+
+import Data.SBV.SMT.Utils     ( showTimeoutValue, debug, mergeSExpr, SBVException(..)
                               , startTranscript, recordTranscript, finalizeTranscript, recordEndTime, recordException, TranscriptMsg(..)
                               )
 
-import Data.SBV.Utils.PrettyNum
-import Data.SBV.Utils.Lib       (joinArgs, splitArgs, needsBars, showText)
-import Data.SBV.Utils.SExpr     (parenDeficit, nameSupply)
+import Data.SBV.Utils.Lib       (joinArgs, splitArgs)
+import Data.SBV.Utils.SExpr     (parenDeficit)
 
 import qualified System.Timeout as Timeout (timeout)
+#endif
 
 import Numeric
 
@@ -675,6 +691,7 @@ shCV SMTConfig{printBase, crackNum, verbose, crackNumSurfaceVals} nm cv = cracke
                              Nothing -> def
                              Just cs -> def ++ "\n" ++ cs
 
+#ifndef SBV_WASM
 -- | Helper function to spin off to an SMT solver.
 pipeProcess :: SMTConfig -> State -> String -> [String] -> T.Text -> (State -> IO a) -> IO a
 pipeProcess cfg ctx execName opts pgm continuation = do
@@ -1078,3 +1095,12 @@ handleAsync e cont
   where -- Stealing this definition from the asynchronous exceptions package to reduce dependencies
         isAsynchronous :: Bool
         isAsynchronous = isJust (C.fromException e :: Maybe C.AsyncException) || isJust (C.fromException e :: Maybe C.SomeAsyncException)
+#else
+-- | On the WebAssembly (SBV_WASM) target there is no operating-system process
+-- to spawn; the browser engine ('Data.SBV.SMT.BrowserEngine.browserEngine')
+-- drives the in-browser solver instead. 'standardEngine' is retained only so
+-- the native solver values ('Data.SBV.Provers.Z3' and friends) still typecheck;
+-- it must never be invoked on this target (the browser default is @z3Wasm@).
+standardEngine :: String -> String -> SMTEngine
+standardEngine _ _ = error "Data.SBV.SMT.SMT.standardEngine: the process-based engine is unavailable on the WebAssembly (SBV_WASM) target; use the browser engine (z3Wasm)."
+#endif

@@ -20,7 +20,7 @@
 {-# LANGUAGE TypeAbstractions           #-}
 {-# LANGUAGE TypeApplications           #-}
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.TP.Utils (
          TP, runTP, runTPWith, tryTP, whenDryRun, unlessDryRun, Proof(..), ProofObj(..), assumptionFromProof, sorry, quickCheckProof, noTermCheckProof

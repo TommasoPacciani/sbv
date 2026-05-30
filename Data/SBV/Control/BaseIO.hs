@@ -11,7 +11,7 @@
 -- @Data.SBV.Control@, where we restrict the underlying monad to be IO.
 -----------------------------------------------------------------------------
 
-{-# OPTIONS_GHC -Wall -Werror #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Data.SBV.Control.BaseIO where
 

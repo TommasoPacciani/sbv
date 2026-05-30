@@ -14,3 +14,11 @@ dist-newstyle/
 *.o
 *.hi
 .claude
+
+# wasm backend: build outputs and reference checkouts (regenerable / external)
+dist-wasm/
+.vite/
+web/node_modules/
+web/sbv-wasm-demo.wasm
+web/sbv-wasm-demo.js
+grisette-ref/
