@@ -84,6 +84,11 @@ User story: As a researcher, I want to swap solvers with minimal effort.
 2. Z3 SHALL be the primary backend. cvc5, Bitwuzla, and Yices2 are accepted
    candidate secondaries (must speak SMT-LIB2 on stdin/stdout).
 
+> Implemented: the MVP ships a maintained prebuilt `wasm32-wasi` **Boolector**
+> (YoWASP) to satisfy R7.1 without building or forking a solver. Z3 (full
+> theories) is a drop-in follow-on (build to wasm32-wasi, or wrap emscripten z3
+> as a pipe-process); demo queries are bit-vector only meanwhile.
+
 ## R8 — Performance
 User story: As a user, I want fast solving and startup.
 1. Per-session solver work SHALL be O(commands), not O(commands^2).

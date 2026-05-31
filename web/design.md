@@ -249,3 +249,18 @@ owns SAB allocation and answers `spawnSolver`.
   `directory`; fallback is a one-line CPP import swap in `SMT.hs`.
 - **R-6 System.Timeout:** won't interrupt a blocked syscall; deadlines are
   enforced at the pipe (R-D). Validate the outer `timeout` still behaves.
+
+## 8. Update — what the prototype actually built
+
+- **Solver:** rather than building z3 (which required *editing z3 sources* for
+  wasi-libc gaps — a fork we explicitly reject), the MVP uses a **maintained
+  prebuilt `wasm32-wasi` Boolector** (YoWASP). Selected by exec name, so z3/cvc5/
+  Bitwuzla remain drop-ins. Demo theories are therefore bit-vector only.
+- **Engine mode:** SBV runs as a **WASI command** (`_start`→`main`), not a
+  reactor — the whole solver interaction is synchronous over blocking pipes, so
+  the async/Promise reactor model and `hs_init` export are unnecessary.
+- **Realised seam:** `os-shim` provides `System.Process`+`System.Directory`;
+  `runInteractiveProcess` uses `fdToHandle'` (Stream + explicit `WriteMode`/
+  `ReadMode`). Two `PipeFd` details were required: `fd_filestat_get` (char device,
+  for GHC `fdType`) and `fd_prestat_get`→`BADF` (else wasi-libc's preopen scan
+  `_Exit`s with `EX_OSERR`=71). See `DEMO.md` for run/verify.

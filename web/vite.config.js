@@ -1,6 +1,6 @@
-// Vite dev-server config. z3-solver's build uses SharedArrayBuffer (threads),
-// which browsers only expose to cross-origin-isolated pages. These headers turn
-// that on. They are also what you must replicate behind any other static server.
+// Vite dev-server config. The prototype uses SharedArrayBuffer + Atomics across
+// Web Workers, which browsers only expose to cross-origin-isolated pages. These
+// headers turn that on; replicate them behind any other static server.
 export default {
   server: {
     headers: {
@@ -8,6 +8,4 @@ export default {
       'Cross-Origin-Embedder-Policy': 'require-corp',
     },
   },
-  // Let vite pre-bundle z3-solver (it's CommonJS) so the default import resolves.
-  optimizeDeps: { include: ['z3-solver'] },
 };
