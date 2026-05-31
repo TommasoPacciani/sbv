@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { WASI, OpenFile, File, ConsoleStdout } from '@bjorn3/browser_wasi_shim';
 import { makePipe, Pipe } from '../src/sabpipe.js';
 import { PipeFd } from '../src/pipefd.js';
+import { installPoll } from '../src/poll.js';
 import ghcWasmJSFFI from '../sbv-wasm-demo.js';
 
 const wasi = new WASI([], [], [
@@ -13,12 +14,16 @@ const wasi = new WASI([], [], [
   ConsoleStdout.lineBuffered((s) => parentPort.postMessage({ type: 'stderr', line: s })),
 ]);
 
+const pollFds = new Map();
+installPoll(wasi, pollFds);
+
 globalThis.spawnSolver = (exe, argsStr) => {
   const cmdSab = makePipe(), respSab = makePipe(), errSab = makePipe();
   const base = wasi.fds.length;
-  wasi.fds.push(new PipeFd(null, new Pipe(cmdSab)));
-  wasi.fds.push(new PipeFd(new Pipe(respSab), null));
-  wasi.fds.push(new PipeFd(new Pipe(errSab), null));
+  const outFd = new PipeFd(new Pipe(respSab), null);
+  const errFd = new PipeFd(new Pipe(errSab), null);
+  wasi.fds.push(new PipeFd(null, new Pipe(cmdSab)), outFd, errFd);
+  pollFds.set(base + 1, outFd); pollFds.set(base + 2, errFd);
   parentPort.postMessage({ type: 'spawnSolver', cmdSab, respSab, errSab, exe, args: argsStr });
   return base;
 };

@@ -6,6 +6,7 @@
 import { WASI, OpenFile, File, ConsoleStdout } from '@bjorn3/browser_wasi_shim';
 import { makePipe, Pipe } from './sabpipe.js';
 import { PipeFd } from './pipefd.js';
+import { installPoll } from './poll.js';
 import ghcWasmJSFFI from '../sbv-wasm-demo.js';
 
 const wasi = new WASI([], [], [
@@ -14,14 +15,18 @@ const wasi = new WASI([], [], [
   ConsoleStdout.lineBuffered((s) => postMessage({ type: 'stderr', line: s })), // 2
 ]);
 
+const pollFds = new Map();   // fd -> PipeFd (bytesAvailable) for poll_oneoff
+installPoll(wasi, pollFds);  // wire SBV's timeout/hReady path (else throws in browser)
+
 // Called synchronously from SBV's runInteractiveProcess (unsafe JSFFI).
 // exe = "/bin/boolector", argsStr = newline-joined options.
 globalThis.spawnSolver = (exe, argsStr) => {
   const cmdSab = makePipe(), respSab = makePipe(), errSab = makePipe();
   const base = wasi.fds.length;
-  wasi.fds.push(new PipeFd(null, new Pipe(cmdSab)));   // base   : inh  (SBV writes)
-  wasi.fds.push(new PipeFd(new Pipe(respSab), null));  // base+1 : outh (SBV reads)
-  wasi.fds.push(new PipeFd(new Pipe(errSab), null));   // base+2 : errh (SBV reads)
+  const outFd = new PipeFd(new Pipe(respSab), null);  // base+1 : outh (SBV reads)
+  const errFd = new PipeFd(new Pipe(errSab), null);   // base+2 : errh (SBV reads)
+  wasi.fds.push(new PipeFd(null, new Pipe(cmdSab)), outFd, errFd);  // base : inh (SBV writes)
+  pollFds.set(base + 1, outFd); pollFds.set(base + 2, errFd);
   postMessage({ type: 'spawnSolver', cmdSab, respSab, errSab, exe, args: argsStr });
   return base;
 };

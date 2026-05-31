@@ -39,6 +39,6 @@ const finished = new Promise((resolve) => {
 const why = await Promise.race([finished, new Promise((r) => setTimeout(() => r('timeout'), 120000))]);
 await sbv.terminate();
 
-const ok = /Satisfiable/.test(out) && /Q\.E\.D\./.test(out);
+const ok = /Satisfiable/.test(out) && /Q\.E\.D\./.test(out) && /\(3,7\) then x=7 -> 7/.test(out);
 console.log(ok && why === 'done' ? '\nPASS' : `\nFAIL (${why})`);
 process.exit(ok && why === 'done' ? 0 : 1);

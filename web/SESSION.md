@@ -102,3 +102,26 @@ headless check — the Node test had masked it.
 **Backlog:** cvc5 from source (`.kiro/specs/full-theory-browser-solvers/cvc5-blocker.md`)
 — builds but its emscripten CLI throws on `callMain`; needs the corrected
 `--wasm=JS` recipe. Not on the Grisette critical path.
+
+
+---
+
+## Milestone — incremental query mode works; timeout characterized
+
+**#2 Incremental (query mode) — WORKS, verified.** `wasm/Main.hs` now runs a
+`runSMTWith z3 $ query $ do { push; constrain; checkSat; getValue; pop; ... }`
+exercising push/pop, repeated `check-sat`, and `get-value` over the z3 pipe.
+Result `(3,7) then x=7 -> 7` confirmed in Node (`e2e`) and headless Chrome
+(`run-browser-check`). This is the Grisette-relevant capability.
+
+**#3 Timeouts — wired poll, but RTS-timeout traps.** `installPoll` (poll.js) is
+now installed in both `sbv-worker.js` and the node harness (registers solver
+read fds; `poll_oneoff` no longer throws "unimplemented"). However, SBV's
+`setTimeOut` makes the response reader wrap `hGetLine` in
+`System.Timeout.timeout`, which relies on the threaded RTS timer + async
+exceptions; on the single-threaded wasm RTS during a blocking foreign read this
+raises an **uncatchable `WebAssembly.Exception`** (crashes the worker). So
+solver-side query timeouts are deferred (limitation B): the fix is to thread a
+deadline into the `PipeFd` read (`deadlineMs`, already supported) so a hung
+solver returns control to the RTS, instead of relying on `System.Timeout`.
+Normal (non-timeout) solving is unaffected.

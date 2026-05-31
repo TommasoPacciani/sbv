@@ -3,6 +3,7 @@ module Main (main) where
 import Control.Exception (try, SomeException)
 import System.IO
 import Data.SBV
+import Data.SBV.Control
 
 main :: IO ()
 main = do
@@ -37,3 +38,19 @@ body = do
   -- Z3: prove
   r6 <- proveWith z3 $ \x -> x + 0 .== (x :: SInteger)
   putStrLn $ "prove (x + 0 == x :: SInteger): " ++ show r6
+
+  -- Z3: incremental query mode (push/pop, repeated check-sat, get-value)
+  rq <- runSMTWith z3 $ do
+          [x, y] <- sIntegers ["x", "y"]
+          constrain $ x + y .== 10
+          query $ do
+            push 1
+            constrain $ x .== 3
+            cs1 <- checkSat
+            v1  <- case cs1 of { Sat -> show <$> ((,) <$> getValue x <*> getValue y); _ -> pure (show cs1) }
+            pop 1
+            constrain $ x .== 7
+            cs2 <- checkSat
+            v2  <- case cs2 of { Sat -> show <$> getValue x; _ -> pure (show cs2) }
+            pure (v1 ++ " then x=7 -> " ++ v2)
+  putStrLn $ "query (incremental push/pop): " ++ rq

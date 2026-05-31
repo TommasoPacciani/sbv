@@ -35,6 +35,7 @@ while (Date.now() < deadline) {
 console.log('=== PAGE #out ===\n' + text);
 // Require the full-theory results (z3): Int=4, Real=2.5, Double=2.5, plus a prove.
 const ok = /Q\.E\.D\./.test(text) && /4 :: Integer/.test(text)
-        && /2\.5 :: Real/.test(text) && /2\.5 :: Double/.test(text);
+        && /2\.5 :: Real/.test(text) && /2\.5 :: Double/.test(text)
+        && /\(3,7\) then x=7 -> 7/.test(text);
 console.log(ok ? 'BROWSER PASS' : 'BROWSER FAIL');
 process.exit(ok ? 0 : 1);
