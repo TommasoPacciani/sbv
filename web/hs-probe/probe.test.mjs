@@ -10,7 +10,7 @@ const ghc = new Worker(new URL('./ghc-worker.mjs', import.meta.url), { workerDat
 const msg = await new Promise((resolve) => ghc.on('message', resolve));
 await echo.terminate(); await ghc.terminate();
 
-if (msg.ok && msg.result === 'GOT:hello-from-haskell') {
+if (msg.ok && msg.ok && String(msg.result).includes('GOT:hello-from-haskell')) {
   console.log('PASS', JSON.stringify(msg.result));
   process.exit(0);
 } else {

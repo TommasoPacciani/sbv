@@ -32,6 +32,13 @@ export class PipeFd extends Fd {
     return { ret: 0, filestat: new Filestat(0n, FILETYPE_CHARACTER_DEVICE, 0n) };
   }
 
+  fd_prestat_get() {
+    // A pipe is not a preopened directory. wasi-libc scans fds 3.. for preopens
+    // on the first path operation and _Exit(EX_OSERR=71)s on any non-BADF error,
+    // so we must answer BADF (not the base class's NOTSUP).
+    return { ret: wasi.ERRNO_BADF, prestat: null };
+  }
+
   fd_close() {
     if (this.readPipe) this.readPipe.close();
     if (this.writePipe) this.writePipe.close();

@@ -9,7 +9,6 @@
 -- A few internally used types/routines
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE CPP            #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
 {-# OPTIONS_GHC -Wall #-}
@@ -55,9 +54,7 @@ import Data.List  (intercalate)
 import qualified Data.Set      as Set (Set)
 import qualified Data.Sequence as S   (Seq)
 
-#ifndef SBV_WASM
 import System.Directory (findExecutable)
-#endif
 import System.Exit      (ExitCode(..))
 
 -- | An instance of SMT-Lib converter; instantiated for SMT-Lib v1 and v2. (And potentially for newer versions in the future.)
@@ -235,11 +232,7 @@ recordEndTime SMTConfig{timing} state = case timing of
 startTranscript :: Maybe FilePath -> SMTConfig -> IO ()
 startTranscript Nothing  _   = return ()
 startTranscript (Just f) cfg = do ts <- show <$> getZonedTime
-#ifndef SBV_WASM
                                   mbExecPath <- findExecutable (executable (solver cfg))
-#else
-                                  let mbExecPath = Nothing :: Maybe FilePath
-#endif
                                   writeFile f $ start ts mbExecPath
   where SMTSolver{name, options} = solver cfg
         start ts mbPath = unlines [ ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"

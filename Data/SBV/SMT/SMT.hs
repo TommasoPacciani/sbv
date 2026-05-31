@@ -19,7 +19,6 @@
 {-# LANGUAGE TypeApplications           #-}
 {-# LANGUAGE UndecidableInstances       #-}
 {-# LANGUAGE ViewPatterns               #-}
-{-# LANGUAGE CPP                        #-}
 
 {-# OPTIONS_GHC -Wall #-}
 
@@ -45,9 +44,7 @@ module Data.SBV.SMT.SMT (
 
 import qualified Control.Exception as C
 
-#ifndef SBV_WASM
 import Control.Concurrent (newEmptyMVar, takeMVar, putMVar, forkIO)
-#endif
 import Control.DeepSeq    (NFData(..))
 import Control.Monad      (zipWithM, mplus)
 import Data.Char          (isSpace)
@@ -63,15 +60,11 @@ import Data.IORef (readIORef, writeIORef)
 
 import Data.Either (rights)
 
-#ifndef SBV_WASM
 import System.Directory   (findExecutable)
 import System.Environment (getEnv)
-#endif
 import System.Exit        (ExitCode(..))
-#ifndef SBV_WASM
 import System.IO          (hClose, hFlush, hPutStrLn, hGetContents, hGetLine, hReady, hGetChar)
 import System.Process     (runInteractiveProcess, waitForProcess, terminateProcess)
-#endif
 
 import qualified Data.Map.Strict as M
 import qualified Data.Text       as T
@@ -93,9 +86,7 @@ import Data.SBV.Utils.PrettyNum
 import Data.SBV.Utils.Lib       (joinArgs, splitArgs, needsBars)
 import Data.SBV.Utils.SExpr     (parenDeficit, nameSupply)
 
-#ifndef SBV_WASM
 import qualified System.Timeout as Timeout (timeout)
-#endif
 
 import Numeric
 
@@ -678,7 +669,6 @@ shCV SMTConfig{printBase, crackNum, verbose, crackNumSurfaceVals} nm cv = cracke
                              Nothing -> def
                              Just cs -> def ++ "\n" ++ cs
 
-#ifndef SBV_WASM
 -- | Helper function to spin off to an SMT solver.
 pipeProcess :: SMTConfig -> State -> String -> [String] -> String -> (State -> IO a) -> IO a
 pipeProcess cfg ctx execName opts pgm continuation = do
@@ -1050,15 +1040,6 @@ runSolver cfg ctx execPath opts pgm continuation
                                                                             finalizeTranscript (transcript cfg) ec
                                                                             recordEndTime cfg ctx
                                                                             C.throwIO e)
-#else
--- | On the browser (WebAssembly) target there is no operating-system process
--- to spawn; the in-browser engine is 'Data.SBV.SMT.BrowserEngine.browserEngine'
--- (wired in via 'Data.SBV.Provers.Z3Wasm.z3Wasm'). 'standardEngine' still has
--- to exist because the native solver descriptions (Z3, CVC5, ...) reference it,
--- but it is never invoked on this target.
-standardEngine :: String -> String -> SMTEngine
-standardEngine = error "Data.SBV.SMT.SMT.standardEngine: not available on the WebAssembly (SBV_WASM) target; use the browser engine (z3Wasm) instead"
-#endif
 
 -- We should not be catching/processing asynchronous exceptions.
 -- See http://github.com/LeventErkok/sbv/issues/410

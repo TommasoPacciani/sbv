@@ -47,9 +47,7 @@ import Control.Monad.Trans       (MonadIO(liftIO), lift)
 import Control.Monad.State.Lazy  (MonadState, StateT(..), modify')
 import Data.Char                 (toLower, isSpace)
 import Data.List                 (nub, isPrefixOf, intercalate, (\\))
-#ifndef SBV_WASM
 import System.Directory          (createDirectoryIfMissing, doesDirectoryExist, doesFileExist)
-#endif
 import System.FilePath           ((</>))
 import System.IO                 (hFlush, stdout)
 
@@ -355,7 +353,6 @@ codeGen l cgConfig nm (SBVCodeGen comp) = do
 -- | Render a code-gen bundle to a directory or to stdout
 renderCgPgmBundle :: Maybe FilePath -> (CgConfig, CgPgmBundle) -> IO ()
 renderCgPgmBundle Nothing        (_  , bundle)              = print bundle
-#ifndef SBV_WASM
 renderCgPgmBundle (Just dirName) (cfg, CgPgmBundle _ files) = do
 
         b <- doesDirectoryExist dirName
@@ -383,12 +380,6 @@ renderCgPgmBundle (Just dirName) (cfg, CgPgmBundle _ files) = do
         renderFile (f, (_, ds)) = do let fn = dirName </> f
                                      unless overWrite $ putStrLn $ "Generating: " ++ show fn ++ ".."
                                      writeFile fn (render' (vcat ds))
-#else
--- | On the browser (WebAssembly) target there is no operating-system directory
--- to write generated code into; only the @'Nothing'@ (print-to-stdout) form of
--- 'renderCgPgmBundle' is supported.
-renderCgPgmBundle (Just _) _ = error "Data.SBV.Compilers.CodeGen.renderCgPgmBundle: writing generated code to a directory is not available on the WebAssembly (SBV_WASM) target"
-#endif
 
 -- | An alternative to Pretty's @render@, which might have "leading" white-space in empty lines. This version
 -- eliminates such whitespace.

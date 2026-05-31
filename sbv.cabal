@@ -94,14 +94,12 @@ Library
   if flag(doctest_is_running)
     CPP-Options: -DDOCTEST
 
-  -- Dual-target build: on the WebAssembly (browser) target select the in-browser
-  -- solver engine via -DSBV_WASM and drop the OS-process modules (process,
-  -- directory); GHC.Wasm.Prim (the JSFFI used by Data.SBV.SMT.WasmBridge) lives
-  -- in ghc-experimental. libBF is kept on BOTH targets (its portable C sources
-  -- are compiled by the wasm clang toolchain), so the FP theories stay present.
+  -- Dual-target build: on the WebAssembly (browser) target, SBV runs its
+  -- PRISTINE native engine; System.Process/System.Directory are provided by the
+  -- out-of-tree sbv-wasm-os shim (which drives an in-browser wasm32-wasi solver
+  -- over SharedArrayBuffer pipes). libBF is kept on BOTH targets.
   if arch(wasm32)
-    CPP-Options: -DSBV_WASM
-    build-depends: ghc-experimental
+    build-depends: sbv-wasm-os
   else
     build-depends: directory
                  , process
@@ -298,8 +296,6 @@ Library
                   , Data.SBV.SMT.SMTLib2
                   , Data.SBV.SMT.SMTLibNames
                   , Data.SBV.SMT.Utils
-                  , Data.SBV.SMT.WasmBridge
-                  , Data.SBV.SMT.BrowserEngine
                   , Data.SBV.Provers.Prover
                   , Data.SBV.Provers.ABC
                   , Data.SBV.Provers.Boolector
@@ -311,7 +307,6 @@ Library
                   , Data.SBV.Provers.OpenSMT
                   , Data.SBV.Provers.Yices
                   , Data.SBV.Provers.Z3
-                  , Data.SBV.Provers.Z3Wasm
                   , Data.SBV.Utils.CrackNum
                   , Data.SBV.Utils.ExtractIO
                   , Data.SBV.Utils.Numeric
@@ -572,3 +567,11 @@ Benchmark SBVBench
                   , BenchSuite.Strings.SQLInjection
                   , BenchSuite.Existentials.Diophantine
                   , BenchSuite.Transformers.SymbolicEval
+
+executable sbv-wasm-demo
+  default-language: Haskell2010
+  hs-source-dirs:   wasm
+  main-is:          Main.hs
+  build-depends:    base, sbv
+  if !arch(wasm32)
+    buildable: False

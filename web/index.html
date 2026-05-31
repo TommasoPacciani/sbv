@@ -1,40 +1,17 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SBV in the browser (WebAssembly + z3-solver)</title>
-    <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 60rem; }
-      h1 { font-size: 1.4rem; }
-      #output {
-        white-space: pre-wrap;
-        background: #0b1021;
-        color: #d7e0ff;
-        padding: 1rem;
-        border-radius: 8px;
-        min-height: 12rem;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.9rem;
-      }
-      .hint { color: #555; font-size: 0.9rem; }
-    </style>
-  </head>
-  <body>
-    <h1>SBV in the browser</h1>
-    <p class="hint">
-      SBV (compiled to WebAssembly by GHC) drives the official Microsoft Z3
-      WebAssembly build (<code>z3-solver</code>) entirely in your browser — no
-      server, no OS process. Open the developer console for additional detail.
-    </p>
-    <pre id="output"></pre>
-    <!-- z3-solver's CommonJS browser build references Node's `global`; shim it. -->
-    <script>globalThis.global = globalThis;</script>
-    <!-- Emscripten factory: defines global `initZ3`, which z3-solver's init() needs.
-         Must be a classic script (sets a global) and load before the module. -->
-    <script src="/node_modules/z3-solver/build/z3-built.js"></script>
-    <!-- Must be served over HTTP(S); see web/README.md. Cross-origin isolation
-         headers are required for z3-solver's threaded build. -->
-    <script type="module" src="./loader.mjs"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <title>SBV in the browser — native engine over WASI Boolector</title>
+  <style>body{font:14px/1.5 system-ui,sans-serif;margin:2rem;max-width:820px}pre{background:#111;color:#0f0;padding:1rem;border-radius:6px;white-space:pre-wrap}</style>
+</head>
+<body>
+  <h1>SBV in the browser</h1>
+  <p>Pristine SBV's <b>native</b> solver engine, driving a prebuilt
+     <code>wasm32-wasi</code> Boolector as a real process — its <code>System.Process</code>
+     pipes faked by an out-of-tree OS shim over <code>SharedArrayBuffer</code>.</p>
+  <pre id="out">loading…
+</pre>
+  <script type="module" src="./main.js"></script>
+</body>
 </html>
