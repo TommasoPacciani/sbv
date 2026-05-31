@@ -1,6 +1,6 @@
 // pipefd.js – browser_wasi_shim Fd over a SAB Pipe.
 import { Fd, wasi } from '@bjorn3/browser_wasi_shim';
-const { Fdstat, FILETYPE_CHARACTER_DEVICE } = wasi;
+const { Fdstat, Filestat, FILETYPE_CHARACTER_DEVICE } = wasi;
 
 export class PipeFd extends Fd {
   constructor(readPipe, writePipe, opts = {}) {
@@ -24,6 +24,12 @@ export class PipeFd extends Fd {
 
   fd_fdstat_get() {
     return { ret: 0, fdstat: new Fdstat(FILETYPE_CHARACTER_DEVICE, 0) };
+  }
+
+  fd_filestat_get() {
+    // Needed by GHC-wasm fdToHandle (it calls fdType -> fstat). Report a
+    // character device so the Handle is treated as an unseekable stream.
+    return { ret: 0, filestat: new Filestat(0n, FILETYPE_CHARACTER_DEVICE, 0n) };
   }
 
   fd_close() {
