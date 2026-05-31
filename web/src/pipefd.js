@@ -10,6 +10,10 @@ export class PipeFd extends Fd {
     this.deadlineMs = opts.deadlineMs;
   }
 
+  bytesAvailable() {
+    return this.readPipe ? this.readPipe.bytesAvailable() : 0;
+  }
+
   fd_read(size) {
     if (!this.readPipe) return { ret: 0, data: new Uint8Array(0) };
     const data = this.readPipe.readBytes(size, this.deadlineMs);
