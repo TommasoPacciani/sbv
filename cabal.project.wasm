@@ -16,7 +16,12 @@
 --
 -- It adds the head.hackage overlay (patched packages that build with the GHC
 -- wasm nightly) and the boot-package allow-newer/installed constraints.
-packages: . os-shim/
+packages: . os-shim/ grisette-ref/grisette/ wasm-grisette/
+
+-- Grisette defaults its `optimize` flag to True (-O2). Keep builds light/fast.
+package grisette
+  flags: -optimize
+  optimization: False
 
 optimization: False
 
