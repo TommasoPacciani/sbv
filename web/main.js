@@ -2,8 +2,11 @@
 // requests by creating a solver worker bound to the same SAB pipes, and prints
 // SBV's stdout. The broker only does postMessage/Worker creation (never blocks),
 // so Atomics.wait stays confined to the workers.
-const exeMap = { boolector: new URL('./solver/boolector.wasm', import.meta.url).href };
-const z3Solvers = new Set(['z3']);
+const wasiSolvers = { boolector: new URL('./solver/boolector.wasm', import.meta.url).href };
+const emscriptenSolvers = {
+  z3:   { module: new URL('./solver/z3.js',   import.meta.url).href, args: ['-smt2', '-in'] },
+  cvc5: { module: new URL('./solver/cvc5.js', import.meta.url).href, args: ['--lang', 'smt2', '--incremental', '-'] },
+};
 const basename = (p) => p.split('/').pop();
 const out = document.getElementById('out');
 const log = (s) => { out.textContent += s + '\n'; };
@@ -17,15 +20,20 @@ sbv.onmessage = (ev) => {
     case 'stderr': console.warn('[sbv stderr]', m.line); break;
     case 'spawnSolver': {
       const name = basename(m.exe);
-      if (z3Solvers.has(name)) {
-        // Z3: persistent-context emscripten build (no WASI command, uses eval_smtlib2_string)
-        const sw = new Worker(new URL('./src/z3-pipe-worker.js', import.meta.url), { type: 'module' });
-        sw.postMessage({ cmdSab: m.cmdSab, respSab: m.respSab, errSab: m.errSab });
+      const emDef = emscriptenSolvers[name];
+      if (emDef) {
+        // Emscripten CLI solvers (z3, cvc5) — single-threaded, blocking stdin
+        const sw = new Worker(new URL('./src/emscripten-cli-worker.js', import.meta.url), { type: 'module' });
+        sw.postMessage({
+          module: emDef.module,
+          args: emDef.args,
+          cmdSab: m.cmdSab, respSab: m.respSab, errSab: m.errSab,
+        });
       } else {
         // WASI command solvers (boolector, bitwuzla, etc.)
         const args = [name, ...m.args.split('\n').filter(Boolean)];
         const sw = new Worker(new URL('./src/solver-worker.js', import.meta.url), { type: 'module' });
-        sw.postMessage({ cmdSab: m.cmdSab, respSab: m.respSab, errSab: m.errSab, wasmPath: exeMap[name], args });
+        sw.postMessage({ cmdSab: m.cmdSab, respSab: m.respSab, errSab: m.errSab, wasmPath: wasiSolvers[name], args });
       }
       break;
     }

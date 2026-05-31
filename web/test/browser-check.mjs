@@ -29,10 +29,12 @@ let text = '';
 while (Date.now() < deadline) {
   const r = await send('Runtime.evaluate', { expression: 'document.getElementById("out")?.innerText || ""', returnByValue: true });
   text = (r.result && r.result.value) || '';
-  if (/Satisfiable|Q\.E\.D\.|ERROR/.test(text)) break;
+  if (/\[all queries done\]|ERROR|EXC:/.test(text)) break;
   await new Promise((r) => setTimeout(r, 1000));
 }
 console.log('=== PAGE #out ===\n' + text);
-const ok = /Satisfiable/.test(text) && /Q\.E\.D\./.test(text);
+// Require the full-theory results (z3): Int=4, Real=2.5, Double=2.5, plus a prove.
+const ok = /Q\.E\.D\./.test(text) && /4 :: Integer/.test(text)
+        && /2\.5 :: Real/.test(text) && /2\.5 :: Double/.test(text);
 console.log(ok ? 'BROWSER PASS' : 'BROWSER FAIL');
 process.exit(ok ? 0 : 1);
