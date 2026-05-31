@@ -13,3 +13,11 @@ dist-newstyle/
 .brokdb
 *.o
 *.hi
+# wasm browser prototype build artifacts
+web/node_modules/
+web/.vite/
+dist-wasm/
+grisette-ref/
+z3-wasi-build/
+*.wasm
+.vite/

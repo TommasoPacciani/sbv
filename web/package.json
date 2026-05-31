@@ -1,0 +1,18 @@
+{
+  "name": "sbv-browser-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Run SBV in the browser, driving the z3-solver WebAssembly build through SBV's browser engine.",
+  "scripts": {
+    "postlink": "node \"$(wasm32-wasi-ghc-9.15 --print-libdir)/post-link.mjs\" -i sbv-wasm-demo.wasm -o sbv-wasm-demo.js",
+    "serve": "vite --port 8080"
+  },
+  "dependencies": {
+    "z3-solver": "4.15.0"
+  },
+  "devDependencies": {
+    "@bjorn3/browser_wasi_shim": "0.4.1",
+    "vite": "5.4.10"
+  }
+}
