@@ -53,7 +53,7 @@ import Prelude hiding (Foldable(..))
 import Data.Bits (Bits(..))
 import Data.List (genericIndex, genericLength, genericTake, foldr, length, foldl', elem, nub, sort, null, elemIndex)
 
-import Data.Maybe (isNothing)
+import Data.Maybe (isNothing, fromMaybe)
 
 import Data.SBV.Core.AlgReals
 import Data.SBV.Core.Kind
@@ -593,28 +593,55 @@ cCompare k op x y =
           | True                                                               = Nothing
 
         -- | Array equality. See above comments.
+        --
+        -- Both arrays are fully concrete here ('ArrayModel CVal CVal'), so we have
+        -- complete information and can always decide extensional (SMT object)
+        -- equality exactly. We must do so, because the underlying solver's
+        -- extensional array theory is known to be incomplete/unsound for arrays
+        -- that differ only in their default (const) region (e.g. z3 4.15 answers
+        -- @sat@ for @store (K d1) i v == store (K d2) i v@ with @d1 /= d2@), so
+        -- deferring concrete array equality to the solver is not safe.
+        --
+        -- Two arrays are equal iff their /effective/ values agree at every index:
+        -- the effective value at a key is the stored value if present, else the
+        -- default. They agree everywhere iff (a) they agree on every explicitly
+        -- stored key, and (b) either their defaults match (so the unstored region
+        -- agrees) or the stored keys cover the entire (finite) index domain (so
+        -- the default region is empty and a default mismatch is unobservable).
         svArrEqual :: Kind -> Kind -> ArrayModel CVal CVal -> ArrayModel CVal CVal -> Maybe Bool
         svArrEqual k1 k2 (ArrayModel asc1 def1) (ArrayModel asc2 def2)
          | not (all eqCheckIsObjectEq [k1, k2])
-         = Nothing
+         = Nothing                  -- index/element eq is problematic (e.g. floats); leave it symbolic
+         | not explicitMatch
+         = Just False               -- some explicitly-known index already differs
+         | def1 == def2
+         = Just True                -- agree on known keys, and agree on the (shared) default region
+         | domainCovered
+         = Just True                -- defaults differ, but no index is left in the default region
          | True
-         = let -- Use of lookup is safe here, because we already made sure equality is *not* problematic above
-               keysMatch = and [key `lookup` asc1 == key `lookup` asc2 | key <- nub (sort (map fst (asc1 ++ asc2)))]
-               defsMatch = def1 == def2
+         = Just False               -- defaults differ and at least one index observes that difference
+         where
+           -- Indices explicitly stored in either array.
+           keys = nub (sort (map fst (asc1 ++ asc2)))
 
-               -- Check if keys cover everything. Clearly, we can't do this for all kinds; but only finite ones
-               -- For the time being, we're retricting ourselves to bool only. Might want to extend this later.
-               complete  = case k1 of
-                             KBool -> let bools       = map cvVal [falseCV, trueCV]
-                                          covered asc = all (`elem` map fst asc) bools
-                                      in covered asc1 && covered asc2
-                             _     -> False
+           -- Exact effective value at a key (both arrays are fully concrete).
+           eff asc def key = fromMaybe def (key `lookup` asc)
 
-           in case (keysMatch, defsMatch, complete) of
-                (False, _   ,  _)    -> Just False -- keys mismatch. Nothing else matters.
-                (True,  True,  _)    -> Just True  -- keys match, def matches; so all is good. Complete doesn't matter.
-                (True,  False, True) -> Just True  -- keys match, but defs don't. But we keys are complete, so def mismatch is OK
-                _                    -> Nothing    -- otherwise, we don't really know. So, remain symbolic.
+           -- Do the two arrays agree on every explicitly-stored index?
+           explicitMatch = and [eff asc1 def1 key == eff asc2 def2 key | key <- keys]
+
+           -- Do the stored indices cover the entire (finite) index domain? For an
+           -- infinite index domain this is never the case.
+           domainCovered = case domainCardinality k1 of
+                             Just n  -> toInteger (length keys) >= n
+                             Nothing -> False
+
+        -- | Cardinality of a (finite) index kind, if finite. Used to decide whether
+        -- the stored keys exhaust the index domain.
+        domainCardinality :: Kind -> Maybe Integer
+        domainCardinality KBool          = Just 2
+        domainCardinality (KBounded _ w) = Just (2 ^ w)
+        domainCardinality _              = Nothing
 
 -- | Equality. This is SMT object equality.
 svEqual :: SVal -> SVal -> SVal
