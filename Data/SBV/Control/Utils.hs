@@ -1183,20 +1183,59 @@ extractValue mbi nm k = do
                           Nothing -> ""
                           Just i  -> " :model_index " ++ show i
 
-           cmd        = "(get-value (" ++ nm ++ ")" ++ modelIndex ++ ")"
-
-           bad = unexpected "get-value" cmd ("a value binding for kind: " ++ show k) Nothing
-
-       r <- ask cmd
-
        si <- queryState >>= getSInfo
 
-       let recover val = case recoverKindedValue si k val of
-                           Just cv -> return cv
-                           Nothing -> bad r Nothing
+       case k of
+         -- Finite-domain arrays: decode by POINTWISE solver evaluation instead of
+         -- reparsing the (open-ended) model-term syntax z3 emits for array values.
+         -- We enumerate the index domain and ask the solver for @(select nm key)@ at
+         -- each key, so every term shape -- @store@ chains, @(as const ...)@, @ite@
+         -- lambdas, the identity lambda @(lambda (x) x)@, @let@-shared variants, and
+         -- whatever z3 emits next -- is handled uniformly, because z3 itself does the
+         -- evaluation (cf. 'pointWiseExtract' for boolean uninterpreted functions).
+         -- The domain is bounded by the index key width (for SBV-modelled registers,
+         -- the register size), so this materializes exactly the array's slots --
+         -- which is the same data a concrete model of the array consists of. Wider
+         -- index domains fall through to the syntactic decoder below; those are
+         -- necessarily almost-constant @store@/@(as const)@ arrays it can decode, and
+         -- it fails loud (no silent default) on anything it cannot.
+         KArray k1 k2 | Just keyCVs <- enumerableDomain k1 ->
+            do let getElem keyCV = do
+                     let keyLit = cvToSMTLib RoundNearestTiesToEven keyCV
+                         cmd    = "(get-value ((select " ++ nm ++ " " ++ keyLit ++ "))" ++ modelIndex ++ ")"
+                         bad    = unexpected "get-value" cmd ("an array element of kind: " ++ show k2) Nothing
+                     r <- ask cmd
+                     parse r bad $ \case
+                       EApp [EApp [_sel, valE]] -> case recoverKindedValue si k2 valE of
+                                                     Just elemCV -> pure (cvVal keyCV, cvVal elemCV)
+                                                     Nothing     -> bad r Nothing
+                       _                        -> bad r Nothing
+               assocs <- mapM getElem keyCVs
+               -- Every key is materialized into 'assocs', so the default is immaterial
+               -- to the denoted function; pick the element kind's zero. (Downstream
+               -- consumers canonicalize overrides against the default.)
+               let CV _ def = defaultKindedValue k2
+               pure $ CV k (CArray (ArrayModel assocs def))
 
-       parse r bad $ \case EApp [EApp [ECon v, val]] | v == nm -> recover val
-                           _                                   -> bad r Nothing
+         _ -> do let cmd = "(get-value (" ++ nm ++ ")" ++ modelIndex ++ ")"
+                     bad = unexpected "get-value" cmd ("a value binding for kind: " ++ show k) Nothing
+                 r <- ask cmd
+                 let recover val = case recoverKindedValue si k val of
+                                     Just cv -> return cv
+                                     Nothing -> bad r Nothing
+                 parse r bad $ \case EApp [EApp [ECon v, val]] | v == nm -> recover val
+                                     _                                   -> bad r Nothing
+  where -- Index domains small enough to enumerate fully into a model. Capped so a
+        -- pathologically wide index never blows up; real register key widths are far
+        -- below the cap, and over-cap arrays take the syntactic decoder instead.
+        enumerableDomain :: Kind -> Maybe [CV]
+        enumerableDomain KBool                          = Just [falseCV, trueCV]
+        enumerableDomain kk@(KBounded _ w) | w <= maxArrayIdxBits
+                                                        = Just [mkConstCV kk i | i <- [0 .. 2 ^ w - 1 :: Integer]]
+        enumerableDomain _                              = Nothing
+
+        maxArrayIdxBits :: Int
+        maxArrayIdxBits = 16
 
 -- | Generalization of 'Data.SBV.Control.getUICVal'
 getUICVal :: forall m. (MonadIO m, MonadQuery m) => Maybe Int -> (String, (Bool, Maybe [String], SBVType)) -> m CV

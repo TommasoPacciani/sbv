@@ -500,15 +500,40 @@ parseLambdaExpression funExpr = case squashLambdas funExpr of
 --    (x (_ as-array x))
 --
 -- So, we specifically handle that here, by returning a Left of that name.
+--
+-- NB. When an array model value gets large, Z3 shares store-chain subterms via
+-- nested @let@ bindings, e.g.
+--
+--    (let ((a!1 (store (store ((as const (Array (_ BitVec 4) (_ BitVec 1))) #b1) #x7 #b0) #x5 #b0)))
+--      (store a!1 #x4 #b0))
+--
+-- We resolve these by threading a let-environment through the walk. This is
+-- capture-free by construction: the store/const value grammar contains no binder
+-- other than @let@ itself, so a let-introduced name can never be shadowed or
+-- captured here, and plain name resolution is sound. (A @let@ wrapping a
+-- @lambda@/set value flows through the lambda parsers instead, not this one.)
 parseStoreAssociations :: SExpr -> Maybe (Either String ([([SExpr], SExpr)], SExpr))
 parseStoreAssociations (EApp [ECon "_", ECon "as-array", ECon nm]) = Just $ Left nm
-parseStoreAssociations e                                           = Right <$> (chainAssigns =<< vals e)
-    where vals :: SExpr -> Maybe [Either ([SExpr], SExpr) SExpr]
-          vals (EApp [EApp [ECon "as", ECon "const", ECon "Array"],            defVal]) = return [Right defVal]
-          vals (EApp [EApp [ECon "as", ECon "const", EApp (ECon "Array" : _)], defVal]) = return [Right defVal]
-          vals (EApp (ECon "store" : prev : argsVal)) | length argsVal >= 2             = do rest <- vals prev
-                                                                                             return $ Left (init argsVal, last argsVal) : rest
-          vals _                                                                        = Nothing
+parseStoreAssociations e                                           = Right <$> (chainAssigns =<< vals [] e)
+    where vals :: [(String, SExpr)] -> SExpr -> Maybe [Either ([SExpr], SExpr) SExpr]
+          -- SMT-LIB let is parallel: each RHS is resolved against the outer env, then the body in the extended env.
+          vals env (EApp [ECon "let", EApp binds, body]) = do bs <- traverse bind binds
+                                                              vals ([(v, sub env rhs) | (v, rhs) <- bs] ++ env) body
+            where bind (EApp [ECon v, rhs]) = Just (v, rhs)
+                  bind _                    = Nothing
+          vals env (ECon v) | Just t <- lookup v env                                       = vals env t
+          vals env (EApp [EApp [ECon "as", ECon "const", ECon "Array"],            defVal]) = return [Right (sub env defVal)]
+          vals env (EApp [EApp [ECon "as", ECon "const", EApp (ECon "Array" : _)], defVal]) = return [Right (sub env defVal)]
+          vals env (EApp (ECon "store" : prev : argsVal)) | length argsVal >= 2             = do rest <- vals env prev
+                                                                                                 let as = map (sub env) argsVal
+                                                                                                 return $ Left (init as, last as) : rest
+          vals _   _                                                                        = Nothing
+
+          -- Resolve let-bound names within the (binder-free) value grammar.
+          sub :: [(String, SExpr)] -> SExpr -> SExpr
+          sub env (ECon v)  = maybe (ECon v) id (lookup v env)
+          sub env (EApp xs) = EApp (map (sub env) xs)
+          sub _   leaf      = leaf
 
 -- | Turn a sequence of left-right chain assignments (condition + free) into a single chain
 -- NB. We make sure the results here are unique, i.e., there's only one assignment to each unique entry
