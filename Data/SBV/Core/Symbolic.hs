@@ -1015,6 +1015,7 @@ data IncState = IncState { rNewInps        :: IORef [NamedSymVar]   -- always ex
                          , rNewConsts      :: IORef CnstMap
                          , rNewTbls        :: IORef TableMap
                          , rNewUIs         :: IORef UIMap
+                         , rNewDefnNames   :: IORef (Set.Set String)
                          , rNewAsgns       :: IORef SBVPgm
                          , rNewConstraints :: IORef (S.Seq (Bool, [(String, String)], SV))
                          }
@@ -1027,6 +1028,7 @@ newIncState = do
         nc    <- newIORef Map.empty
         tm    <- newIORef Map.empty
         ui    <- newIORef Map.empty
+        ds    <- newIORef Set.empty
         pgm   <- newIORef (SBVPgm S.empty)
         cstrs <- newIORef S.empty
         return IncState { rNewInps        = is
@@ -1034,6 +1036,7 @@ newIncState = do
                         , rNewConsts      = nc
                         , rNewTbls        = tm
                         , rNewUIs         = ui
+                        , rNewDefnNames   = ds
                         , rNewAsgns       = pgm
                         , rNewConstraints = cstrs
                         }
@@ -1250,6 +1253,15 @@ modifyIncState State{rIncState} field update = do
         incState <- readIORef rIncState
         R.modifyIORef' (field incState) update
 
+-- | Modify the incremental state when the root state is in query mode. Lambda
+-- generation uses a child state, but shares the root's declaration state.
+modifyIncStateAtRootIRun :: State -> (IncState -> IORef a) -> (a -> a) -> IO ()
+modifyIncStateAtRootIRun st field update = do
+        rm <- readIORef (runMode (getRootState st))
+        case rm of
+          SMTMode _ IRun _ _ -> modifyIncState st field update
+          _                  -> pure ()
+
 -- | Add an observable
 -- notice that we cons like a list, we should build at the end of the seq, but cons to preserve semantics for now
 recordObservable :: State -> String -> (CV -> Bool) -> SV -> IO ()
@@ -1343,15 +1355,10 @@ newUninterpreted st uiName mbArgNames t uiCode = do
 
   isCurried <- case uiCode of
                  UINone c -> pure c
-                 UISMT d  -> do modifyState st rDefns (\defs -> (nm, (d, t)) : filter (\(onm, _) -> onm /= nm) defs)
-                                  $ noInteractive [ "Defined functions (smtFunction):"
-                                                  , "  Name: " ++ nm ++ extraComment
-                                                  , "  Type: " ++ show t
-                                                  , ""
-                                                  , "You should explicitly register these functions by calling"
-                                                  , "the function 'registerFunction' on them before starting the query section."
-                                                  ]
-                                pure True
+                 UISMT d  -> do
+                   modifyState st rDefns (\defs -> (nm, (d, t)) : filter (\(onm, _) -> onm /= nm) defs) (pure ())
+                   modifyIncStateAtRootIRun st rNewDefnNames (Set.insert nm)
+                   pure True
                  UICgC c  -> -- No need to record the code in interactive mode: CodeGen doesn't use interactive
                              do modifyState st rCgMap (Map.insert nm c) (return ())
                                 pure True
@@ -1368,11 +1375,12 @@ newUninterpreted st uiName mbArgNames t uiCode = do
     uiMap <- readIORef (rUIMap st)
     case nm `Map.lookup` uiMap of
       Just (_, _, t') -> checkType t' (return ())
-      Nothing         -> modifyState st rUIMap (Map.insert nm (isCurried, mbArgNames, t))
-                           $ modifyIncState st rNewUIs
-                                              (\newUIs -> case nm `Map.lookup` newUIs of
-                                                            Just (_, _, t') -> checkType t' newUIs
-                                                            Nothing         -> Map.insert nm (isCurried, mbArgNames, t) newUIs)
+      Nothing         -> do
+        modifyState st rUIMap (Map.insert nm (isCurried, mbArgNames, t)) (pure ())
+        modifyIncStateAtRootIRun st rNewUIs
+          (\newUIs -> case nm `Map.lookup` newUIs of
+                        Just (_, _, t') -> checkType t' newUIs
+                        Nothing         -> Map.insert nm (isCurried, mbArgNames, t) newUIs)
 
   pure $ case uiName of
           UIGiven{}                  -> Uninterpreted nm
@@ -1446,19 +1454,18 @@ registerKind st k
                          KADT s _ _  -> s `elem` [s' | KADT s' _ _ <- Set.toList existingKinds]
                          _           -> False
 
-       unless adtExists $
-          modifyState st rUsedKinds (Set.insert k) $ do
+       unless adtExists $ do
+          -- Why do we discriminate here? Because the incremental context is sensitive to the
+          -- order: In particular, if an uninterpreted kind is already in there, we don't
+          -- want to re-add because double-declaration would be wrong. See 'cvtInc' for details.
+          let needsAdding = case k of
+                              KADT s _ _  -> s `notElem` [s' | KADT s' _ _ <- Set.toList existingKinds]
+                              KList{}     -> k `notElem` existingKinds
+                              KTuple nks  -> length nks `notElem` [length oks | KTuple oks <- Set.toList existingKinds]
+                              _           -> False
 
-              -- Why do we discriminate here? Because the incremental context is sensitive to the
-              -- order: In particular, if an uninterpreted kind is already in there, we don't
-              -- want to re-add because double-declaration would be wrong. See 'cvtInc' for details.
-              let needsAdding = case k of
-                                  KADT s _ _  -> s `notElem` [s' | KADT s' _ _ <- Set.toList existingKinds]
-                                  KList{}     -> k `notElem` existingKinds
-                                  KTuple nks  -> length nks `notElem` [length oks | KTuple oks <- Set.toList existingKinds]
-                                  _           -> False
-
-              when needsAdding $ modifyIncState st rNewKinds (Set.insert k)
+          modifyState st rUsedKinds (Set.insert k) (pure ())
+          when needsAdding $ modifyIncStateAtRootIRun st rNewKinds (Set.insert k)
 
        -- Don't forget to register subkinds!
        case k of

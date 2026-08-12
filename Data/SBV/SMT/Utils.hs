@@ -84,6 +84,7 @@ type SMTLibIncConverter a =  ProgInfo                                    -- ^ Va
                           -> (CnstMap, [(SV, CV)])                       -- ^ all constants sofar, and new constants
                           -> [((Int, Kind, Kind), [SV])]                 -- ^ newly created tables
                           -> [(String, (Bool, Maybe [String], SBVType))] -- ^ newly created uninterpreted functions/constants
+                          -> [(String, (SMTDef, SBVType))]               -- ^ newly created definitions
                           -> SBVPgm                                      -- ^ assignments
                           -> S.Seq (Bool, [(String, String)], SV)        -- ^ extra constraints
                           -> SMTConfig                                   -- ^ configuration

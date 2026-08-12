@@ -683,7 +683,7 @@ instance (SymVal env, SymVal a, SymVal b) => SFoldL (Closure (SBV env) (SBV b ->
                                    (h, t)        = uncons xs
                                in ite (null xs)
                                       e
-                                      (sbvFoldl (tuple (cEnv, closureFun closureEnv e h, t)))
+                                      (sbvFoldl (tuple (cEnv, closureFun cEnv e h, t)))
 
 -- | A class of right foldable functions. In SBV, we make a distinction between closures and regular functions, and
 -- we instantiate this class appropriately so it can handle both cases.
@@ -737,7 +737,7 @@ instance (SymVal env, SymVal a, SymVal b) => SFoldR (Closure (SBV env) (SBV a ->
                                    (h, t)        = uncons xs
                                in ite (null xs)
                                       e
-                                      (closureFun closureEnv h (sbvFoldr (tuple (cEnv, e, t))))
+                                      (closureFun cEnv h (sbvFoldr (tuple (cEnv, e, t))))
 
 -- | @`zip` xs ys@ zips the lists to give a list of pairs. The length of the final list is
 -- the minumum of the lengths of the given lists.

@@ -80,7 +80,7 @@ import Data.SBV.Core.Symbolic ( IncState(..), withNewIncState, State(..), svToSV
                               , isSafetyCheckingIStage, isSetupIStage, isRunIStage, IStage(..), QueryT(..)
                               , extractSymbolicSimulationState, MonadSymbolic(..)
                               , UserInputs, getSV, NamedSymVar(..), lookupInput, getUserName'
-                              , Name, CnstMap, Inputs(..), ProgInfo(..)
+                              , Name, CnstMap, Inputs(..), ProgInfo(..), SMTDef
                               , mustIgnoreVar, newInternalVariable, Penalty(..)
                               )
 
@@ -103,7 +103,7 @@ import Data.SBV.Utils.PrettyNum (cvToSMTLib)
 
 import Data.SBV.Control.Types
 
-import qualified Data.Set as Set (empty, fromList, toAscList)
+import qualified Data.Set as Set (empty, fromList, member, toAscList)
 
 import qualified Control.Exception as C
 
@@ -166,8 +166,8 @@ io :: MonadIO m => IO a -> m a
 io = liftIO
 
 -- | Sync-up the external solver with new context we have generated
-syncUpSolver :: (MonadIO m, MonadQuery m) => ProgInfo -> IORef CnstMap -> IncState -> m ()
-syncUpSolver progInfo rGlobalConsts is = do
+syncUpSolver :: (MonadIO m, MonadQuery m) => ProgInfo -> IORef CnstMap -> IORef [(String, (SMTDef, SBVType))] -> IncState -> m ()
+syncUpSolver progInfo rGlobalConsts rDefns is = do
         cfg <- getConfig
 
         -- update global consts to have the new ones
@@ -183,13 +183,22 @@ syncUpSolver progInfo rGlobalConsts is = do
                        inps        <- reverse <$> readIORef (rNewInps is)
                        ks          <- readIORef (rNewKinds is)
                        tbls        <- map arrange . sortBy cmp . map swap . Map.toList <$> readIORef (rNewTbls is)
-                       uis         <- Map.toAscList <$> readIORef (rNewUIs is)
+                       defnNames   <- readIORef (rNewDefnNames is)
+                       allDefns    <- readIORef rDefns
+                       newUIs      <- readIORef (rNewUIs is)
                        as          <- readIORef (rNewAsgns is)
                        constraints <- readIORef (rNewConstraints is)
 
                        let cnsts = sortBy cmp . map swap . Map.toList $ newConsts
+                           uis = Map.toAscList $ Map.filterWithKey (\name _ -> not (name `Set.member` defnNames)) newUIs
+                           resolve name =
+                             case filter ((== name) . fst) allDefns of
+                               [defn] -> defn
+                               [] -> error $ "Data.SBV.syncUpSolver: Missing incremental definition: " ++ show name
+                               _ -> error $ "Data.SBV.syncUpSolver: Duplicate incremental definition: " ++ show name
+                           defns = map resolve (Set.toAscList defnNames)
 
-                       return $ map T.unpack $ toIncSMTLib cfg progInfo inps ks (allConsts, cnsts) tbls uis as constraints cfg
+                       return $ map T.unpack $ toIncSMTLib cfg progInfo inps ks (allConsts, cnsts) tbls uis defns as constraints cfg
 
         mapM_ (send True) $ mergeSExpr ls
 
@@ -218,10 +227,10 @@ modifyQueryState f = do state <- queryState
 
 -- | Generalization of 'Data.SBV.Control.inNewContext'
 inNewContext :: (MonadIO m, MonadQuery m) => (State -> IO a) -> m a
-inNewContext act = do st@State{rconstMap, rProgInfo} <- queryState
+inNewContext act = do st@State{rconstMap, rDefns, rProgInfo} <- queryState
                       (is, r)  <- io $ withNewIncState st act
                       progInfo <- io $ readIORef rProgInfo
-                      syncUpSolver progInfo rconstMap is
+                      syncUpSolver progInfo rconstMap rDefns is
                       return r
 
 -- | Generalization of 'Data.SBV.Control.freshVar_'
@@ -1343,7 +1352,7 @@ getObservables = do State{rObservables} <- queryState
 -- Generalization of 'Data.SBV.Control.getUIs'.
 getUIs :: forall m. (MonadIO m, MonadQuery m) => m [(String, (Bool, Maybe [String], SBVType))]
 getUIs = do State{rUIMap, rDefns, rIncState} <- queryState
-            -- NB. no need to worry about new-defines, because we don't allow definitions once query mode starts
+            -- Definitions are deterministic code, not model-chosen UFs.
             defines <- do allDefs <- io $ readIORef rDefns
                           pure $ map fst allDefs
 

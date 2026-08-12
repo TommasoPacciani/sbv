@@ -454,7 +454,7 @@ declRationals = [ "(declare-datatype SBVRational ((SBV.Rational (sbv.rat.numerat
 -- for a list of what we include, in case something doesn't show up
 -- and you need it!
 cvtInc :: SMTLibIncConverter [Text]
-cvtInc curProgInfo inps newKs (_, consts) tbls uis (SBVPgm asgnsSeq) cstrs cfg =
+cvtInc curProgInfo inps newKs (_, consts) tbls uis defns (SBVPgm asgnsSeq) cstrs cfg =
             -- any new settings?
                settings
             -- sorts
@@ -469,6 +469,8 @@ cvtInc curProgInfo inps newKs (_, consts) tbls uis (SBVPgm asgnsSeq) cstrs cfg =
             <> concatMap (declUI curProgInfo) uis
             -- table declarations
             <> tableDecls
+            -- user defined functions
+            <> incrementalUserDefs
             -- expressions
             <> concatMap (declDef curProgInfo cfg tableMap) asgnsSeq
             -- table setups
@@ -485,6 +487,14 @@ cvtInc curProgInfo inps newKs (_, consts) tbls uis (SBVPgm asgnsSeq) cstrs cfg =
             where (tm, ct, nct) = constructTables rm consts tbls
 
         (tableDecls, tableAssigns) = unzip $ map mkTable allTables
+
+        -- Query sending ignores standalone comments. Split only the leading
+        -- diagnostic lines so the following definition is sent as an SMT command.
+        incrementalUserDefs = concatMap splitLeadingComments (declUserFuns defns)
+
+        splitLeadingComments rendered =
+          let (comments, definition) = span (T.isPrefixOf ";") (T.lines rendered)
+           in comments <> [T.unlines definition | not (null definition)]
 
         -- If we need flattening in models, do emit the required lines if preset
         settings

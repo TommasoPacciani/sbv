@@ -271,6 +271,24 @@ tests =
                                                ( \xss ys ->   map (cls  ys) xss
                                                , \xss ys -> P.map (P.++ ys) xss
                                                )
+
+      , testCase "closure-fold-environment" $
+          assertIsThm $ \(leftEnv :: SInteger) (rightEnv :: SInteger) ->
+            let foldLeft env =
+                  foldl Closure { closureEnv = env
+                                , closureFun = \captured accumulated element -> captured + accumulated + element
+                                }
+                        0 [1, 2, 3]
+                foldRight env =
+                  foldr Closure { closureEnv = env
+                                , closureFun = \captured element accumulated -> captured + element + accumulated
+                                }
+                        0 [1, 2, 3]
+                expected env = 3 * env + 6
+            in     foldLeft  leftEnv  .== expected leftEnv
+               .&& foldLeft  rightEnv .== expected rightEnv
+               .&& foldRight leftEnv  .== expected leftEnv
+               .&& foldRight rightEnv .== expected rightEnv
       ]
    P.++ qc1 "lambdaQC1" P.sum (foldr ((+) @SInteger) (0::SInteger))
    P.++ qc2 "lambdaQC2" (+)  (smtFunction "sadd" ((+) :: SInteger -> SInteger -> SInteger))
