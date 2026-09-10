@@ -35,6 +35,7 @@ module Data.SBV.Control.Utils (
      , getTopLevelInputs, parse, unexpected
      , timeout, queryDebug, retrieveResponse, recoverKindedValue, runProofOn, executeQuery
      , startOptimizer, getObjectiveValues, getModel, getModelAtIndex
+     , ModelQuery(..), getModelFor
      ) where
 
 import Data.List  (sortBy, sortOn, partition, groupBy, tails, intercalate, nub, sort, isPrefixOf, isSuffixOf)
@@ -76,7 +77,7 @@ import Data.SBV.Core.Data     ( SV(..), trueSV, falseSV, CV(..), trueCV, falseCV
 
 import Data.SBV.Core.Symbolic ( IncState(..), withNewIncState, State(..), svToSV, symbolicEnv, SymbolicT
                               , MonadQuery(..), QueryContext(..), VarContext(..)
-                              , registerLabel, svMkSymVar, validationRequested
+                              , registerLabel, svMkSymVar, validationRequested, getRegisteredKinds
                               , isSafetyCheckingIStage, isSetupIStage, isRunIStage, IStage(..), QueryT(..)
                               , extractSymbolicSimulationState, MonadSymbolic(..)
                               , UserInputs, getSV, NamedSymVar(..), lookupInput, getUserName'
@@ -97,7 +98,7 @@ import Data.SBV.SMT.Utils   ( showTimeoutValue, addAnnotations, alignPlain, debu
                             )
 
 import Data.SBV.Utils.ExtractIO
-import Data.SBV.Utils.Lib       (qfsToString, unBar)
+import Data.SBV.Utils.Lib       (qfsToString, unBar, barify)
 import Data.SBV.Utils.SExpr
 import Data.SBV.Utils.PrettyNum (cvToSMTLib)
 
@@ -1373,10 +1374,10 @@ getAllSatResult = do queryDebug ["*** Checking Satisfiability, all solutions.."]
                                         , "*** Please use a solver that supports this feature."
                                         ]
 
-                     topState@State{rUsedKinds, rPartitionVars, rProgInfo} <- queryState
+                     topState@State{rPartitionVars, rProgInfo} <- queryState
 
                      progInfo <- liftIO $ readIORef rProgInfo
-                     ki       <- liftIO $ readIORef rUsedKinds
+                     ki       <- liftIO $ getRegisteredKinds topState
 
                      allModelInputs    <- getTopLevelInputs
                      allUninterpreteds <- getUIs
@@ -2161,6 +2162,100 @@ getObjectiveValues = do let cmd = "(get-objectives)"
 getModel :: (MonadIO m, MonadQuery m) => m SMTModel
 getModel = getModelAtIndex Nothing
 
+-- | One already registered model binding. This low-level request does not
+-- introduce symbols or synchronize newly constructed expressions.
+data ModelQuery
+  = ModelInput String SV -- ^ The original input name and its already declared 'SV'.
+  | ModelFunction String -- ^ The given or canonical name of a registered uninterpreted function.
+
+-- | Read only the requested bindings from the current satisfying model.
+--
+-- Inputs must be free input variables, not arbitrary expressions, and their
+-- names must be the original names recorded when they were declared. Functions
+-- must be uninterpreted symbols, not deterministic SMT definitions. All requests
+-- must belong to this query context and must already have been synchronized
+-- before the caller's satisfiability check. These invariants let the caller
+-- retain its typed symbol index instead of rescanning all SBV inputs or UIs.
+--
+-- The ordinary model policy is preserved: excluded input names are omitted;
+-- functions also respect 'allSatTrackUFs', with exclusion checked on their
+-- canonical registered names. A caller projecting a sparse model must omit
+-- never-declared symbols from its requests, not create them to obtain a value.
+-- An eligible missing function, conflicting registration, or non-function UI
+-- is an invalid request and raises an exception. No default binding is added.
+--
+-- Objectives, observables, and whole-model validation bindings are not queried.
+-- Existing scalar and function decoders are shared with 'getModel'; function
+-- interpretations that those decoders cannot represent retain their ordinary
+-- 'Left' result. The returned model, like 'getModel', is lazy in decoded values.
+getModelFor :: forall m. (MonadIO m, MonadQuery m) => [ModelQuery] -> m SMTModel
+getModelFor requested = do
+    State{runMode, rUIMap, rIncState} <- queryState
+    rm <- io $ readIORef runMode
+    case rm of
+      m@CodeGen     -> unavailable m
+      m@LambdaGen{} -> unavailable m
+      m@Concrete{}  -> unavailable m
+      SMTMode{}     -> do
+          cfg   <- getConfig
+          prior <- io $ readIORef rUIMap
+          new   <- io $ readIORef rIncState >>= readIORef . rNewUIs
+
+          let resolveFunction given
+                | null given = invalid "Empty function name."
+                | otherwise = do
+                    let nm | "__internal_sbv_" `isPrefixOf` given = given
+                           | otherwise                          = barify given
+                    if not (allSatTrackUFs cfg) || mustIgnoreVar cfg nm
+                       then pure Nothing
+                       else do
+                           metadata <- case (Map.lookup nm prior, Map.lookup nm new) of
+                             (Just old, Just current)
+                               | old == current -> pure old
+                               | otherwise -> invalid $ "Conflicting function registration: " ++ show nm
+                             (Just old, Nothing)     -> pure old
+                             (Nothing, Just current) -> pure current
+                             (Nothing, Nothing)      -> invalid $ "Function is not registered: " ++ show nm
+                           case metadata of
+                             (_, _, SBVType (_ : _ : _)) -> pure $ Just (nm, metadata)
+                             (_, _, typ) -> invalid $ "Expected an uninterpreted function: " ++ show (nm, typ)
+
+          uiFuns <- catMaybes <$> mapM resolveFunction [nm | ModelFunction nm <- requested]
+
+          let inputs = [(nm, sv) | ModelInput nm sv <- requested, not (mustIgnoreVar cfg nm)]
+              grab (nm, sv) = let wrap !cv = (nm, cv) in wrap <$> getValueCV Nothing sv
+
+          assocs <- mapM grab inputs
+          prepareUIFunctionModel cfg uiFuns
+          functions <- mapM (getUIFunctionModelEntry Nothing) uiFuns
+          pure $ unBarModel SMTModel { modelObjectives = []
+                                     , modelBindings   = Nothing
+                                     , modelAssocs     = assocs
+                                     , modelUIFuns     = functions
+                                     }
+  where
+    invalid :: String -> m a
+    invalid message = io $ C.throwIO $ C.ErrorCall $ "SBV.getModelFor: " ++ message
+
+    unavailable mode = invalid $ "Model is not available in mode: " ++ show mode
+
+-- | Share the existing solver-specific model-printing setup without discovering
+-- or decoding any function outside the supplied list.
+prepareUIFunctionModel :: (MonadIO m, MonadQuery m)
+                       => SMTConfig -> [(String, (Bool, Maybe [String], SBVType))] -> m ()
+prepareUIFunctionModel cfg uiFuns = unless (null uiFuns) $
+    case supportsFlattenedModels (capabilities (solver cfg)) of
+      Nothing   -> return ()
+      Just cmds -> mapM_ (send True) cmds
+
+-- | The common model entry for one known UI; all interpretation remains in the
+-- existing function decoder, including its raw-response failure result.
+getUIFunctionModelEntry :: (MonadIO m, MonadQuery m)
+                        => Maybe Int -> (String, (Bool, Maybe [String], SBVType))
+                        -> m (String, (Bool, SBVType, Either String ([([CV], CV)], CV)))
+getUIFunctionModelEntry mbi ui@(nm, (curried, _, typ)) =
+    (\value -> (nm, (curried, typ, value))) <$> getUIFunCVAssoc mbi ui
+
 -- | Get a model stored at an index. This is likely very Z3 specific!
 getModelAtIndex :: (MonadIO m, MonadQuery m) => Maybe Int -> m SMTModel
 getModelAtIndex mbi = do
@@ -2191,11 +2286,7 @@ getModelAtIndex mbi = do
 
           -- If there are uninterpreted functions, arrange so that z3's pretty-printer flattens things out
           -- as cex's tend to get larger
-          unless (null uiFuns) $
-             let solverCaps = capabilities (solver cfg)
-             in case supportsFlattenedModels solverCaps of
-                  Nothing   -> return ()
-                  Just cmds -> mapM_ (send True) cmds
+          prepareUIFunctionModel cfg uiFuns
 
           bindings <- let get i@(getSV -> sv) = case lookupInput fst sv inputAssocs of
                                                   Just (_, (_, cv)) -> return (i, cv)
@@ -2206,7 +2297,7 @@ getModelAtIndex mbi = do
                          then Just <$> mapM get allModelInputs
                          else return Nothing
 
-          uiFunVals <- mapM (\ui@(nm, (c, _, t)) -> (\a -> (nm, (c, t, a))) <$> getUIFunCVAssoc mbi ui) uiFuns
+          uiFunVals <- mapM (getUIFunctionModelEntry mbi) uiFuns
 
           uiVals    <- mapM (\ui@(nm, (_, _, _)) -> (nm,) <$> getUICVal mbi ui) uiRegs
 

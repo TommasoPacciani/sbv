@@ -79,7 +79,6 @@ import Data.Kind (Type)
 import Data.Proxy
 import Data.Typeable          (Typeable)
 
-import Data.IORef
 import qualified Data.Set as Set (toList)
 
 import GHC.Generics (Generic, U1(..), M1(..), (:*:)(..), K1(..), (:+:)(..))
@@ -561,7 +560,7 @@ newtype SInfo = SInfo { sInfoKinds :: [Kind] }
 
 -- | Turn state into SInfo
 getSInfo :: MonadIO m => State -> m SInfo
-getSInfo st = do rk <- liftIO $ readIORef (rUsedKinds st)
+getSInfo st = do rk <- liftIO $ getRegisteredKinds st
                  pure $ SInfo { sInfoKinds = Set.toList rk }
 
 -- | A class representing what can be returned from a symbolic computation.

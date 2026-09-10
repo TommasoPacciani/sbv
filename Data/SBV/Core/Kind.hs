@@ -185,33 +185,53 @@ kindParen s = case T.uncons s of
                                  then T.singleton '(' <> s <> T.singleton ')'
                                  else s
 
--- | String version of kindParen for backward compatibility
-kindParenStr :: String -> String
-kindParenStr s@('[':_) = s
-kindParenStr s@('(':_) = s
-kindParenStr s | any isSpace s = '(' : s ++ ")"
-               | True          = s
-
 -- | How the type maps to SMT land
 smtType :: Kind -> String
-smtType (KVar s)        = s
-smtType KBool           = "Bool"
-smtType (KBounded _ sz) = "(_ BitVec " ++ show sz ++ ")"
-smtType KUnbounded      = "Int"
-smtType KReal           = "Real"
-smtType KFloat          = "(_ FloatingPoint  8 24)"
-smtType KDouble         = "(_ FloatingPoint 11 53)"
-smtType (KFP eb sb)     = "(_ FloatingPoint " ++ show eb ++ " " ++ show sb ++ ")"
-smtType KString         = "String"
-smtType KChar           = "String"
-smtType (KList k)       = "(Seq "   ++ smtType k ++ ")"
-smtType (KSet  k)       = "(Array " ++ smtType k ++ " Bool)"
-smtType (KApp s ks)     = kindParenStr $ unwords (s : map smtType          ks)
-smtType (KADT s pks _)  = kindParenStr $ unwords (s : map (smtType . snd) pks)
-smtType (KTuple [])     = "SBVTuple0"
-smtType (KTuple kinds)  = "(SBVTuple" ++ show (length kinds) ++ " " ++ unwords (smtType <$> kinds) ++ ")"
-smtType KRational       = "SBVRational"
-smtType (KArray  k1 k2) = "(Array "      ++ smtType k1 ++ " " ++ smtType k2 ++ ")"
+smtType kind = render kind ""
+  where
+    -- A child writes directly into its parent's suffix. Materializing each
+    -- child's String first would repeatedly copy nested tuple/array types.
+    render :: Kind -> ShowS
+    render (KVar s)        = showString s
+    render KBool           = showString "Bool"
+    render (KBounded _ sz) = showString "(_ BitVec " . shows sz . showChar ')'
+    render KUnbounded      = showString "Int"
+    render KReal           = showString "Real"
+    render KFloat          = showString "(_ FloatingPoint  8 24)"
+    render KDouble         = showString "(_ FloatingPoint 11 53)"
+    render (KFP eb sb)     = showString "(_ FloatingPoint " . shows eb
+                          . showChar ' ' . shows sb . showChar ')'
+    render KString         = showString "String"
+    render KChar           = showString "String"
+    render (KList k)       = showString "(Seq " . render k . showChar ')'
+    render (KSet k)        = showString "(Array " . render k . showString " Bool)"
+    render (KApp s ks)     = application s ks
+    render (KADT s pks _)  = application s (map snd pks)
+    render (KTuple [])     = showString "SBVTuple0"
+    render (KTuple kinds)  = showString "(SBVTuple" . shows (length kinds)
+                          . arguments kinds . showChar ')'
+    render KRational       = showString "SBVRational"
+    render (KArray k1 k2)  = showString "(Array " . render k1 . showChar ' '
+                          . render k2 . showChar ')'
+
+    arguments :: [Kind] -> ShowS
+    arguments [] = id
+    arguments (k : ks) = showChar ' ' . render k . arguments ks
+
+    -- Preserve the historical raw-name rule without rendering and scanning
+    -- the entire application: arguments introduce a space themselves, while
+    -- a leading bracket suppresses wrapping regardless of the arguments.
+    application :: String -> [Kind] -> ShowS
+    application name kinds
+      | startsBracket name = body
+      | null kinds && not (any isSpace name) = body
+      | otherwise = showChar '(' . body . showChar ')'
+      where body = showString name . arguments kinds
+
+    startsBracket :: String -> Bool
+    startsBracket ('[' : _) = True
+    startsBracket ('(' : _) = True
+    startsBracket _ = False
 
 instance Eq  G.DataType where
    a == b = G.tyconUQname (G.dataTypeName a) == G.tyconUQname (G.dataTypeName b)

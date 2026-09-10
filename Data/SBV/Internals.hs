@@ -26,13 +26,17 @@
 
 module Data.SBV.Internals (
   -- * Running symbolic programs /manually/
-    Result(..), SBVRunMode(..), IStage(..), QueryContext(..), VarContext(..), SatModel(..), mkNewState
+    Result(..), ResultInp(..), SBVRunMode(..), IStage(..), QueryContext(..), VarContext(..), SatModel(..), mkNewState
+  , hasQuants, runProofOn
 
   -- * Solver capabilities
   , SolverCapabilities(..)
 
   -- * Internal structures useful for low-level programming
   , module Data.SBV.Core.Data
+
+  -- * Rendering symbolic kinds for low-level SMT consumers
+  , smtType
 
   -- * Is this name reserved?
   , isReserved, UIName(..)
@@ -60,6 +64,9 @@ module Data.SBV.Internals (
   -- $coordinateSolverInfo
   , sendStringToSolver, sendRequestToSolver, retrieveResponseFromSolver
 
+  -- * Projected model queries over already registered symbols
+  , ModelQuery(..), getModelFor
+
   -- * Defining new metrics
   , addSValOptGoal
   , sFloatAsComparableSWord32,  sDoubleAsComparableSWord64,  sFloatingPointAsComparableSWord
@@ -79,9 +86,9 @@ import Control.Monad.IO.Class (MonadIO)
 
 import Data.SBV.Core.Data hiding (Forall(..), Exists(..), ForallN(..), ExistsN(..), ExistsUnique(..), Skolemize(..), QNot(..))
 
-import Data.SBV.Core.Kind       (BVIsNonZero, ValidFloat)
+import Data.SBV.Core.Kind       (BVIsNonZero, ValidFloat, smtType)
 import Data.SBV.Core.Model      (genLiteral, genFromCV, genMkSymVar, liftQRem, liftDMod)
-import Data.SBV.Core.Symbolic   (IStage(..), QueryContext(..), MonadQuery, addSValOptGoal, registerKind, VarContext(..), svToSV, mkNewState, UICodeKind(..), UIName(..))
+import Data.SBV.Core.Symbolic   (IStage(..), QueryContext(..), MonadQuery, addSValOptGoal, registerKind, VarContext(..), svToSV, mkNewState, UICodeKind(..), UIName(..), ResultInp(..), hasQuants)
 
 import Data.SBV.Core.Floating   (sFloatAsComparableSWord32,  sDoubleAsComparableSWord64,  sFloatingPointAsComparableSWord, svFloatingPointAsSWord)
 
@@ -103,6 +110,7 @@ import Data.SBV.Utils.PrettyNum
 import GHC.TypeLits
 
 import qualified Data.SBV.Control.Utils as Query
+import Data.SBV.Control.Utils (ModelQuery(..), getModelFor, runProofOn)
 
 import Data.SBV.Lambda
 

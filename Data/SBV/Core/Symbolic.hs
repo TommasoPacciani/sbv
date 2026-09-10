@@ -50,7 +50,7 @@ module Data.SBV.Core.Symbolic
   , getTableIndex, sObserve
   , SBVPgm(..), MonadSymbolic(..), SymbolicT, Symbolic, runSymbolic, mkNewState, runSymbolicInState, State(..), SMTDef(..), withNewIncState, IncState(..), incrementInternalCounter, incrementFreshNameCounter
   , inSMTMode, SBVRunMode(..), IStage(..), Result(..), ResultInp(..), UICodeKind(..), UIName(..)
-  , registerKind, registerLabel, recordObservable
+  , registerKind, getRegisteredKinds, registerLabel, recordObservable
   , addAssertion, addNewSMTOption, imposeConstraint, internalConstraint, newInternalVariable, lambdaVar, quantVar
   , SMTLibPgm(..), SMTLibVersion(..), smtLibVersionExtension
   , SolverCapabilities(..)
@@ -88,12 +88,12 @@ import qualified Control.Monad.State.Lazy    as LS
 import qualified Control.Monad.State.Strict  as SS
 import qualified Control.Monad.Writer.Lazy   as LW
 import qualified Control.Monad.Writer.Strict as SW
-import qualified Data.IORef                  as R    (modifyIORef')
+import qualified Data.IORef                  as R    (modifyIORef', atomicModifyIORef')
 import qualified Data.Generics               as G    (Data(..))
-import qualified Data.Generics.Uniplate.Data as G
 import qualified Data.IntMap.Strict          as IMap (IntMap, empty, lookup, insertWith)
+import qualified Data.IntSet                 as ISet (IntSet, empty, insert, notMember)
 import qualified Data.Map.Strict             as Map  (Map, empty, toList, lookup, insert, size, notMember)
-import qualified Data.Set                    as Set  (Set, empty, toList, insert, member)
+import qualified Data.Set                    as Set  (Set, empty, toList, insert, member, notMember)
 import qualified Data.Foldable               as F    (toList)
 import qualified Data.Sequence               as S    (Seq, empty, (|>), (<|), lookup, elemIndexL)
 import qualified Data.Text                   as T
@@ -942,6 +942,25 @@ type CnstMap = Map.Map CV SV
 -- | Kinds used in the program; used for determining the final SMT-Lib logic to pick
 type KindSet = Set.Set Kind
 
+-- | One context's kind declarations and successful registration identities.
+-- The name and arity indexes describe the same published kinds, including
+-- parents whose child registration later failed. Only completed identities
+-- may bypass child validation. Lambda substates share this entire registry.
+data KindRegistry = KindRegistry
+  { registeredKinds       :: !KindSet
+  , registeredADTNames    :: !(Set.Set String)
+  , registeredTupleArities :: !ISet.IntSet
+  , completedKinds        :: !(IMap.IntMap [CompletedKind])
+  }
+
+-- A StableName alone does not retain its key. Keep the exact WHNF kind alive
+-- for the lifetime of this context, and compare names within each hash bucket.
+data CompletedKind = CompletedKind !(StableName Kind) !Kind
+
+-- | The observable kind set, without exposing mutable registration indexes.
+getRegisteredKinds :: State -> IO KindSet
+getRegisteredKinds st = registeredKinds <$> readIORef (rKindRegistry st)
+
 -- | Tables generated during a symbolic run
 type TableMap = Map.Map (Kind, Kind, [SV]) Int
 
@@ -1155,7 +1174,7 @@ data State  = State { sbvContext          :: SBVContext
                     , rctr                :: IORef Int             -- Used for numbering SVs
                     , freshNameCtr        :: IORef Int             -- Used for calls to some
                     , rLambdaLevel        :: IORef (Maybe Int)     -- If Nothing, then top-level lambda
-                    , rUsedKinds          :: IORef KindSet
+                    , rKindRegistry       :: IORef KindRegistry
                     , rUsedLbls           :: IORef (Set.Set String)
                     , rinps               :: IORef Inputs
                     , rlambdaInps         :: IORef LambdaInputs
@@ -1442,51 +1461,68 @@ registerKind st k
   | KADT sortName _ _ <- k, isReserved sortName
   = error $ "SBV: " ++ show sortName ++ " is a reserved sort; please use a different name."
   | True
-  = do -- Adding a kind to the incState is tricky; we only need to add it
-       --     *    If it's an uninterpreted sort that's not already in the general state
-       --     * OR If it's a tuple-sort whose cardinality isn't already in the general state
-       --     * OR If it's a list that's not already in the general state (so we can send the flatten commands)
+  = do -- Force only this node before naming it, not its ordered children.
+       identity <- makeStableName $! k
+       registry <- readIORef (rKindRegistry st)
+       let bucket = IMap.lookup (hashStableName identity) (completedKinds registry)
+           matches (CompletedKind other _) = identity == other
 
-       existingKinds <- readIORef (rUsedKinds st)
-
-       -- For ADTs we need to make sure we haven't added it before
-       let adtExists = case k of
-                         KADT s _ _  -> s `elem` [s' | KADT s' _ _ <- Set.toList existingKinds]
-                         _           -> False
-
-       unless adtExists $ do
-          -- Why do we discriminate here? Because the incremental context is sensitive to the
-          -- order: In particular, if an uninterpreted kind is already in there, we don't
-          -- want to re-add because double-declaration would be wrong. See 'cvtInc' for details.
-          let needsAdding = case k of
-                              KADT s _ _  -> s `notElem` [s' | KADT s' _ _ <- Set.toList existingKinds]
-                              KList{}     -> k `notElem` existingKinds
-                              KTuple nks  -> length nks `notElem` [length oks | KTuple oks <- Set.toList existingKinds]
-                              _           -> False
-
-          modifyState st rUsedKinds (Set.insert k) (pure ())
+       unless (maybe False (any matches) bucket) $ do
+          -- Publish the parent and its declaration indexes together. A failed
+          -- child leaves this publication in place, just as before, but must
+          -- not mark the parent complete. Incremental declarations remain
+          -- ordered before the children and use the root's query mode.
+          needsAdding <- R.atomicModifyIORef' (rKindRegistry st) publish
           when needsAdding $ modifyIncStateAtRootIRun st rNewKinds (Set.insert k)
 
-       -- Don't forget to register subkinds!
-       case k of
-         KVar      {}    -> return ()
-         KBool     {}    -> return ()
-         KBounded  {}    -> return ()
-         KUnbounded{}    -> return ()
-         KReal     {}    -> return ()
-         KFloat    {}    -> return ()
-         KDouble   {}    -> return ()
-         KFP       {}    -> return ()
-         KRational {}    -> return ()
-         KChar     {}    -> return ()
-         KString   {}    -> return ()
+          case k of
+            KVar      {}    -> return ()
+            KBool     {}    -> return ()
+            KBounded  {}    -> return ()
+            KUnbounded{}    -> return ()
+            KReal     {}    -> return ()
+            KFloat    {}    -> return ()
+            KDouble   {}    -> return ()
+            KFP       {}    -> return ()
+            KRational {}    -> return ()
+            KChar     {}    -> return ()
+            KString   {}    -> return ()
 
-         KApp _ ks       -> mapM_ (registerKind st) ks
-         KADT _ pks cks  -> mapM_ (registerKind st) (map snd pks ++ concatMap snd cks)
-         KList     ek    -> registerKind st ek
-         KSet      ek    -> registerKind st ek
-         KTuple    eks   -> mapM_ (registerKind st) eks
-         KArray    k1 k2 -> mapM_ (registerKind st) [k1, k2]
+            KApp _ ks       -> mapM_ (registerKind st) ks
+            KADT _ pks cks  -> mapM_ (registerKind st) (map snd pks ++ concatMap snd cks)
+            KList     ek    -> registerKind st ek
+            KSet      ek    -> registerKind st ek
+            KTuple    eks   -> mapM_ (registerKind st) eks
+            KArray    k1 k2 -> mapM_ (registerKind st) [k1, k2]
+
+          -- Read the latest registry when completing: recursive registration
+          -- has added its own kinds and successful identities in the meantime.
+          let !completed = CompletedKind identity k
+          R.atomicModifyIORef' (rKindRegistry st) $ \current ->
+            (current { completedKinds = IMap.insertWith (++) (hashStableName identity)
+                                          [completed] (completedKinds current) }, ())
+
+  where -- Incremental declarations are unique by ADT name, tuple arity, or
+        -- exact list kind. The observable set still retains every other kind.
+        -- In particular, a same-name ADT variant does not replace the original
+        -- declaration, but its own children must still be registered above.
+        publish registry = case k of
+          KADT sortName _ _
+            | sortName `Set.member` registeredADTNames registry
+            -> (registry, False)
+            | True
+            -> (insertKind registry { registeredADTNames = Set.insert sortName
+                                            (registeredADTNames registry) }, True)
+          KTuple kinds
+            -> let arity = length kinds
+                   needed = arity `ISet.notMember` registeredTupleArities registry
+               in (insertKind registry { registeredTupleArities = ISet.insert arity
+                                            (registeredTupleArities registry) }, needed)
+          KList{}
+            -> (insertKind registry, k `Set.notMember` registeredKinds registry)
+          _ -> (insertKind registry, False)
+
+        insertKind registry = registry { registeredKinds = Set.insert k (registeredKinds registry) }
 
 -- | Register a new label with the system, making sure they are unique and have no '|'s in them
 registerLabel :: String -> State -> String -> IO ()
@@ -1825,7 +1861,7 @@ mkNewState cfg currentRunMode = liftIO $ do
      cgs                <- newIORef Map.empty
      defns              <- newIORef []
      swCache            <- newIORef IMap.empty
-     usedKinds          <- newIORef Set.empty
+     kindRegistry       <- newIORef (KindRegistry Set.empty Set.empty ISet.empty IMap.empty)
      usedLbls           <- newIORef Set.empty
      cstrs              <- newIORef S.empty
      pvs                <- newIORef []
@@ -1848,7 +1884,7 @@ mkNewState cfg currentRunMode = liftIO $ do
                   , rctr                = ctr
                   , freshNameCtr        = fnctr
                   , rLambdaLevel        = lambda
-                  , rUsedKinds          = usedKinds
+                  , rKindRegistry       = kindRegistry
                   , rUsedLbls           = usedLbls
                   , rinps               = inps
                   , rlambdaInps         = lambdaInps
@@ -1905,16 +1941,123 @@ runSymbolicInState st (SymbolicT c) = do
                  | True
                  = contextMismatchError (sbvContext st) ctx
 
-   mapM_ check $ nubOrd $ G.universeBi res
+   mapM_ check $ nubOrd $ resultContexts res
 
    return (r, res)
+
+-- | Context-bearing fields in the same order as the derived Data traversal.
+-- Kind trees, concrete values, names and rendered definitions cannot contain
+-- an SBVContext. Walking those again for every symbolic node is unnecessary,
+-- especially when many nodes share the same deeply nested tuple kind.
+-- Keep the Result and operator matches exhaustive so new context-bearing
+-- fields cannot silently evade this final check.
+resultContexts :: Result -> [SBVContext]
+resultContexts (Result _progInfo _kinds _traces observables _uiSegs params
+                       (constantMap, constants) tables _uiConsts _definitions
+                       (SBVPgm assignments) constraints assertions outputs) =
+     [contextOfSV sv | (_, _, sv) <- observables]
+  ++ parameterContexts params
+  ++ [contextOfSV sv | (_, sv) <- Map.toList constantMap]
+  ++ [contextOfSV sv | (sv, _) <- constants]
+  ++ [contextOfSV sv | (_, values) <- tables, sv <- values]
+  ++ concatMap assignmentContexts (F.toList assignments)
+  ++ [contextOfSV sv | (_, _, sv) <- F.toList constraints]
+  ++ [contextOfSV sv | (_, _, sv) <- assertions]
+  ++ map contextOfSV outputs
+  where
+    parameterContexts :: ResultInp -> [SBVContext]
+    parameterContexts (ResultTopInps (users, trackers)) =
+      map (contextOfSV . getSV) users ++ map (contextOfSV . getSV) trackers
+    parameterContexts (ResultLamInps quantified) =
+      [contextOfSV (getSV variable) | (_, variable) <- quantified]
+
+    assignmentContexts :: (SV, SBVExpr) -> [SBVContext]
+    assignmentContexts (target, SBVApp operation arguments) =
+      contextOfSV target : operationContexts operation ++ map contextOfSV arguments
+
+    operationContexts :: Op -> [SBVContext]
+    operationContexts operation = case operation of
+      Plus                -> []
+      Times               -> []
+      Minus               -> []
+      UNeg                -> []
+      Abs                 -> []
+      Quot                -> []
+      Rem                 -> []
+      Equal _             -> []
+      Implies             -> []
+      NotEqual            -> []
+      LessThan            -> []
+      GreaterThan         -> []
+      LessEq              -> []
+      GreaterEq           -> []
+      Ite                 -> []
+      And                 -> []
+      Or                  -> []
+      XOr                 -> []
+      Not                 -> []
+      Shl                 -> []
+      Shr                 -> []
+      Rol _               -> []
+      Ror _               -> []
+      Divides _           -> []
+      Extract _ _         -> []
+      Join                -> []
+      ZeroExtend _        -> []
+      SignExtend _        -> []
+      LkUp _ index absent -> [contextOfSV index, contextOfSV absent]
+      KindCast _ _        -> []
+      Uninterpreted _     -> []
+      QuantifiedBool _    -> []
+      SpecialRelOp _ _    -> []
+      Label _             -> []
+      IEEEFP fp           -> floatingPointContexts fp
+      NonLinear _         -> []
+      OverflowOp _        -> []
+      PseudoBoolean _     -> []
+      RegExOp _           -> []
+      StrOp _             -> []
+      SeqOp _             -> []
+      SetOp _             -> []
+      TupleConstructor _  -> []
+      TupleAccess _ _     -> []
+      RationalConstructor -> []
+      ADTOp _             -> []
+      ArrayInit _         -> []
+      ReadArray           -> []
+      WriteArray          -> []
+
+    floatingPointContexts :: FPOp -> [SBVContext]
+    floatingPointContexts operation = case operation of
+      FP_Cast _ _ rounding -> [contextOfSV rounding]
+      FP_Reinterpret _ _   -> []
+      FP_Abs               -> []
+      FP_Neg               -> []
+      FP_Add               -> []
+      FP_Sub               -> []
+      FP_Mul               -> []
+      FP_Div               -> []
+      FP_FMA               -> []
+      FP_Sqrt              -> []
+      FP_Rem               -> []
+      FP_RoundToIntegral   -> []
+      FP_Min               -> []
+      FP_Max               -> []
+      FP_ObjEqual          -> []
+      FP_IsNormal          -> []
+      FP_IsSubnormal       -> []
+      FP_IsZero            -> []
+      FP_IsInfinite        -> []
+      FP_IsNaN             -> []
+      FP_IsNegative        -> []
+      FP_IsPositive        -> []
 
 -- | Grab the program from a running symbolic simulation state.
 extractSymbolicSimulationState :: State -> IO Result
 extractSymbolicSimulationState st@State{ runMode=rrm
                                        , spgm=pgm, rinps=inps, rlambdaInps=linps, routs=outs, rtblMap=tables
                                        , rUIMap=uis, rDefns=defns
-                                       , rAsserts=asserts, rUsedKinds=usedKinds, rCgMap=cgs, rCInfo=cInfo, rConstraints=cstrs
+                                       , rAsserts=asserts, rCgMap=cgs, rCInfo=cInfo, rConstraints=cstrs
                                        , rObservables=observes, rProgInfo=progInfo
                                        } = do
    SBVPgm rpgm  <- readIORef pgm
@@ -1964,7 +2107,7 @@ extractSymbolicSimulationState st@State{ runMode=rrm
                -- drop those that has a definition associated with it
                let defineds = map fst ds
                pure [ui | ui@(nm, _) <- unints, nm `notElem` defineds]
-   knds  <- readIORef usedKinds
+   knds  <- getRegisteredKinds st
    cgMap <- Map.toList <$> readIORef cgs
 
    traceVals   <- reverse <$> readIORef cInfo
