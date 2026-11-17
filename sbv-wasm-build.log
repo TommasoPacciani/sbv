@@ -1,0 +1,499 @@
+Configuration is affected by the following files:
+- cabal.project.wasm
+Build profile: -w ghc-9.15.20260331 -O0
+In order, the following will be built (use -v for more details):
+ - sbv-12.1 (lib) (configuration changed)
+ - sbv-12.1 (exe:sbv-wasm-demo) (configuration changed)
+Configuring library for sbv-12.1...
+Warning: [git-protocol] Cloning over git:// might lead to an arbitrary code
+execution vulnerability. Furthermore, popular forges like GitHub do not
+support it. Use https:// or ssh:// instead.
+Preprocessing library for sbv-12.1...
+Building library for sbv-12.1...
+[  1 of 190] Compiling Data.SBV.Control.Types ( Data/SBV/Control/Types.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Types.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Types.dyn_o ) [Flags changed]
+[  2 of 190] Compiling Data.SBV.Core.AlgReals ( Data/SBV/Core/AlgReals.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/AlgReals.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/AlgReals.dyn_o ) [Flags changed]
+Data/SBV/Core/AlgReals.hs:132:20: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+132 |      where app v | last v == '?' = " = " ++ init v ++ "..."
+    |                    ^^^^
+
+Data/SBV/Core/AlgReals.hs:132:45: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+132 |      where app v | last v == '?' = " = " ++ init v ++ "..."
+    |                                             ^^^^
+
+[  3 of 190] Compiling Data.SBV.SMT.SMTLibNames ( Data/SBV/SMT/SMTLibNames.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLibNames.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLibNames.dyn_o ) [Flags changed]
+[  4 of 190] Compiling Data.SBV.Utils.ExtractIO ( Data/SBV/Utils/ExtractIO.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/ExtractIO.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/ExtractIO.dyn_o ) [Flags changed]
+[  5 of 190] Compiling Data.SBV.Utils.Lib ( Data/SBV/Utils/Lib.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/Lib.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/Lib.dyn_o ) [Flags changed]
+Data/SBV/Utils/Lib.hs:162:49: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+162 | noSurrounding c (c':cs@(_:_)) | c == c' && c == last cs  = init cs
+    |                                                 ^^^^
+
+Data/SBV/Utils/Lib.hs:162:60: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+162 | noSurrounding c (c':cs@(_:_)) | c == c' && c == last cs  = init cs
+    |                                                            ^^^^
+
+Data/SBV/Utils/Lib.hs:183:69: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+183 |                     && not (any (`elem` ("|\\" :: String)) (drop 1 (init nm)))
+    |                                                                     ^^^^
+
+[  6 of 190] Compiling Data.SBV.Core.Kind ( Data/SBV/Core/Kind.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Kind.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Kind.dyn_o ) [Flags changed]
+[  7 of 190] Compiling Data.SBV.Utils.Numeric ( Data/SBV/Utils/Numeric.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/Numeric.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/Numeric.dyn_o ) [Flags changed]
+[  8 of 190] Compiling Data.SBV.Core.SizedFloats ( Data/SBV/Core/SizedFloats.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/SizedFloats.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/SizedFloats.dyn_o ) [Flags changed]
+[  9 of 190] Compiling Data.SBV.Float   ( Data/SBV/Float.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Float.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Float.dyn_o ) [Flags changed]
+[ 10 of 190] Compiling Data.SBV.Core.Concrete ( Data/SBV/Core/Concrete.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Concrete.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Concrete.dyn_o ) [Flags changed]
+[ 11 of 190] Compiling Data.SBV.Utils.TDiff ( Data/SBV/Utils/TDiff.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/TDiff.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/TDiff.dyn_o ) [Flags changed]
+[ 12 of 190] Compiling Data.SBV.Core.Symbolic ( Data/SBV/Core/Symbolic.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Symbolic.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Symbolic.dyn_o ) [Flags changed]
+Data/SBV/Core/Symbolic.hs:1153:85: warning: [GHC-68441] [-Wdeprecations]
+    In the use of
+      instance NFData (a -> b) -- Defined in ‘Control.DeepSeq’
+    arising from a use of ‘rnf’
+    Deprecated: "NFData is not well-defined on function types. https://github.com/haskell/deepseq/issues/16"
+     |
+1153 |   rnf (SMTDef fk frees params body) = rnf fk `seq` rnf frees `seq` rnf params `seq` rnf body
+     |                                                                                     ^^^
+
+Data/SBV/Core/Symbolic.hs:2134:68: warning: [GHC-68441] [-Wdeprecations]
+    In the use of
+      instance NFData (a -> b) -- Defined in ‘Control.DeepSeq’
+    arising from a use of ‘rnf’
+    Deprecated: "NFData is not well-defined on function types. https://github.com/haskell/deepseq/issues/16"
+     |
+2134 |         = rnf hasQuants `seq` rnf kindInfo `seq` rnf qcInfo  `seq` rnf obs    `seq` rnf cgs
+     |                                                                    ^^^
+
+[ 13 of 190] Compiling Data.SBV.Core.Operations ( Data/SBV/Core/Operations.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Operations.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Operations.dyn_o ) [Flags changed]
+[ 14 of 190] Compiling Data.SBV.Core.Sized ( Data/SBV/Core/Sized.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Sized.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Sized.dyn_o ) [Flags changed]
+[ 15 of 190] Compiling Data.SBV.Core.Data ( Data/SBV/Core/Data.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Data.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Data.dyn_o ) [Flags changed]
+[ 16 of 190] Compiling Data.SBV.Utils.SExpr ( Data/SBV/Utils/SExpr.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/SExpr.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/SExpr.dyn_o ) [Flags changed]
+Data/SBV/Utils/SExpr.hs:155:30: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+155 |                    | True  = init n
+    |                              ^^^^
+
+Data/SBV/Utils/SExpr.hs:505:109: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+505 |                                                                                              return $ Left (init argsVal, last argsVal) : rest
+    |                                                                                                             ^^^^
+
+Data/SBV/Utils/SExpr.hs:505:123: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+505 |                                                                                              return $ Left (init argsVal, last argsVal) : rest
+    |                                                                                                                           ^^^^
+
+[ 17 of 190] Compiling Data.SBV.Utils.PrettyNum ( Data/SBV/Utils/PrettyNum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/PrettyNum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/PrettyNum.dyn_o ) [Flags changed]
+[ 18 of 190] Compiling Data.SBV.Utils.CrackNum ( Data/SBV/Utils/CrackNum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/CrackNum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Utils/CrackNum.dyn_o ) [Flags changed]
+[ 19 of 190] Compiling Data.SBV.SMT.Utils ( Data/SBV/SMT/Utils.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/Utils.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/Utils.dyn_o ) [Source file changed]
+[ 20 of 190] Compiling Data.SBV.SMT.SMTLib2 ( Data/SBV/SMT/SMTLib2.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLib2.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLib2.dyn_o ) [Flags changed]
+Data/SBV/SMT/SMTLib2.hs:644:24: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+644 |   where (body, ret) = (init xs, last xs)
+    |                        ^^^^
+
+Data/SBV/SMT/SMTLib2.hs:644:33: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+644 |   where (body, ret) = (init xs, last xs)
+    |                                 ^^^^
+
+Data/SBV/SMT/SMTLib2.hs:1140:34: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1140 |                           _  -> (init inputKS, last inputKS)
+     |                                  ^^^^
+
+Data/SBV/SMT/SMTLib2.hs:1140:48: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1140 |                           _  -> (init inputKS, last inputKS)
+     |                                                ^^^^
+
+[ 21 of 190] Compiling Data.SBV.SMT.SMTLib ( Data/SBV/SMT/SMTLib.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLib.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMTLib.dyn_o ) [Flags changed]
+[ 22 of 190] Compiling Data.SBV.SMT.SMT ( Data/SBV/SMT/SMT.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMT.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SMT/SMT.dyn_o ) [Source file changed]
+Data/SBV/SMT/SMT.hs:518:14: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+518 |     return $ last (0:inds)
+    |              ^^^^
+
+Data/SBV/SMT/SMT.hs:604:30: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+604 |                      tss -> (init tss, last tss)
+    |                              ^^^^
+
+Data/SBV/SMT/SMT.hs:604:40: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+604 |                      tss -> (init tss, last tss)
+    |                                        ^^^^
+
+[ 23 of 190] Compiling Data.SBV.Provers.Z3 ( Data/SBV/Provers/Z3.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Z3.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Z3.dyn_o ) [Flags changed]
+[ 24 of 190] Compiling Data.SBV.Provers.Yices ( Data/SBV/Provers/Yices.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Yices.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Yices.dyn_o ) [Flags changed]
+[ 25 of 190] Compiling Data.SBV.Provers.OpenSMT ( Data/SBV/Provers/OpenSMT.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/OpenSMT.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/OpenSMT.dyn_o ) [Flags changed]
+[ 26 of 190] Compiling Data.SBV.Provers.MathSAT ( Data/SBV/Provers/MathSAT.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/MathSAT.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/MathSAT.dyn_o ) [Flags changed]
+[ 27 of 190] Compiling Data.SBV.Provers.DReal ( Data/SBV/Provers/DReal.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/DReal.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/DReal.dyn_o ) [Flags changed]
+[ 28 of 190] Compiling Data.SBV.Provers.CVC5 ( Data/SBV/Provers/CVC5.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/CVC5.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/CVC5.dyn_o ) [Flags changed]
+[ 29 of 190] Compiling Data.SBV.Provers.CVC4 ( Data/SBV/Provers/CVC4.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/CVC4.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/CVC4.dyn_o ) [Flags changed]
+[ 30 of 190] Compiling Data.SBV.Provers.Boolector ( Data/SBV/Provers/Boolector.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Boolector.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Boolector.dyn_o ) [Flags changed]
+[ 31 of 190] Compiling Data.SBV.Provers.Bitwuzla ( Data/SBV/Provers/Bitwuzla.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Bitwuzla.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Bitwuzla.dyn_o ) [Flags changed]
+[ 32 of 190] Compiling Data.SBV.Provers.ABC ( Data/SBV/Provers/ABC.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/ABC.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/ABC.dyn_o ) [Flags changed]
+[ 33 of 190] Compiling Data.SBV.Lambda  ( Data/SBV/Lambda.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Lambda.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Lambda.dyn_o ) [Flags changed]
+[ 34 of 190] Compiling Data.SBV.Control.Utils ( Data/SBV/Control/Utils.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Utils.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Utils.dyn_o ) [Flags changed]
+Data/SBV/Control/Utils.hs:957:35: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+957 |           = qfsToString $ drop 1 (init xs)
+    |                                   ^^^^
+
+Data/SBV/Control/Utils.hs:1188:52: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1188 |                     SBVType as | length as > 1 -> (init as, last as)
+     |                                                    ^^^^
+
+Data/SBV/Control/Utils.hs:1188:61: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1188 |                     SBVType as | length as > 1 -> (init as, last as)
+     |                                                             ^^^^
+
+Data/SBV/Control/Utils.hs:1670:75: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1670 |                                                              (ats, rt) = (init ts, last ts)
+     |                                                                           ^^^^
+
+Data/SBV/Control/Utils.hs:1670:84: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+     |
+1670 |                                                              (ats, rt) = (init ts, last ts)
+     |                                                                                    ^^^^
+
+[ 35 of 190] Compiling Data.SBV.Control.Query ( Data/SBV/Control/Query.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Query.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/Query.dyn_o ) [Flags changed]
+[ 36 of 190] Compiling Data.SBV.Trans.Control ( Data/SBV/Trans/Control.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Trans/Control.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Trans/Control.dyn_o ) [Flags changed]
+[ 37 of 190] Compiling Data.SBV.Provers.Prover ( Data/SBV/Provers/Prover.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Prover.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Provers/Prover.dyn_o ) [Source file changed]
+[ 38 of 190] Compiling Data.SBV.Tools.GenTest ( Data/SBV/Tools/GenTest.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/GenTest.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/GenTest.dyn_o ) [Flags changed]
+[ 39 of 190] Compiling Data.SBV.Core.Model ( Data/SBV/Core/Model.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Model.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Model.dyn_o ) [Flags changed]
+[ 40 of 190] Compiling Data.SBV.Tuple   ( Data/SBV/Tuple.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tuple.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tuple.dyn_o ) [Flags changed]
+[ 41 of 190] Compiling Data.SBV.Tools.STree ( Data/SBV/Tools/STree.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/STree.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/STree.dyn_o ) [Flags changed]
+[ 42 of 190] Compiling Data.SBV.Tools.Polynomial ( Data/SBV/Tools/Polynomial.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Polynomial.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Polynomial.dyn_o ) [Flags changed]
+Data/SBV/Tools/Polynomial.hs:109:54: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+109 |  | True    = foldr (\x y -> sh x ++ " + " ++ y) (sh (last cs)) (init cs) ++ t
+    |                                                      ^^^^
+
+Data/SBV/Tools/Polynomial.hs:109:65: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+109 |  | True    = foldr (\x y -> sh x ++ " + " ++ y) (sh (last cs)) (init cs) ++ t
+    |                                                                 ^^^^
+
+[ 43 of 190] Compiling Data.SBV.Tools.Overflow ( Data/SBV/Tools/Overflow.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Overflow.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Overflow.dyn_o ) [Flags changed]
+[ 44 of 190] Compiling Data.SBV.TP.Utils ( Data/SBV/TP/Utils.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/Utils.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/Utils.dyn_o ) [Flags changed]
+Data/SBV/TP/Utils.hs:338:56: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+338 |                            np s | ")" `isSuffixOf` s = init s
+    |                                                        ^^^^
+
+[ 45 of 190] Compiling Data.SBV.TP.Kernel ( Data/SBV/TP/Kernel.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/Kernel.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/Kernel.dyn_o ) [Flags changed]
+[ 46 of 190] Compiling Data.SBV.Set     ( Data/SBV/Set.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Set.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Set.dyn_o ) [Flags changed]
+[ 47 of 190] Compiling Data.SBV.Rational ( Data/SBV/Rational.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Rational.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Rational.dyn_o ) [Flags changed]
+[ 48 of 190] Compiling Data.SBV.Maybe   ( Data/SBV/Maybe.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Maybe.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Maybe.dyn_o ) [Flags changed]
+[ 49 of 190] Compiling Data.SBV.Either  ( Data/SBV/Either.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Either.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Either.dyn_o ) [Flags changed]
+[ 50 of 190] Compiling Data.SBV.Core.Floating ( Data/SBV/Core/Floating.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Floating.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Core/Floating.dyn_o ) [Flags changed]
+[ 51 of 190] Compiling Data.SBV.List    ( Data/SBV/List.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/List.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/List.dyn_o ) [Flags changed]
+Data/SBV/List.hs:218:14: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+218 |  = literal $ P.init cs
+    |              ^^^^^^
+
+[ 52 of 190] Compiling Data.SBV.SEnum   ( Data/SBV/SEnum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SEnum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/SEnum.dyn_o ) [Flags changed]
+[ 53 of 190] Compiling Data.SBV.Char    ( Data/SBV/Char.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Char.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Char.dyn_o ) [Flags changed]
+[ 54 of 190] Compiling Data.SBV.RegExp  ( Data/SBV/RegExp.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/RegExp.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/RegExp.dyn_o ) [Flags changed]
+[ 55 of 190] Compiling Data.SBV.Client  ( Data/SBV/Client.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Client.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Client.dyn_o ) [Flags changed]
+[ 56 of 190] Compiling Data.SBV.Trans   ( Data/SBV/Trans.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Trans.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Trans.dyn_o ) [Flags changed]
+[ 57 of 190] Compiling Data.SBV.Control.BaseIO ( Data/SBV/Control/BaseIO.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/BaseIO.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control/BaseIO.dyn_o ) [Flags changed]
+[ 58 of 190] Compiling Data.SBV.Control ( Data/SBV/Control.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Control.dyn_o ) [Flags changed]
+[ 59 of 190] Compiling Data.SBV.Compilers.CodeGen ( Data/SBV/Compilers/CodeGen.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Compilers/CodeGen.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Compilers/CodeGen.dyn_o ) [Source file changed]
+[ 60 of 190] Compiling Data.SBV.Compilers.C ( Data/SBV/Compilers/C.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Compilers/C.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Compilers/C.dyn_o ) [Flags changed]
+[ 61 of 190] Compiling Data.SBV.Tools.CodeGen ( Data/SBV/Tools/CodeGen.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/CodeGen.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/CodeGen.dyn_o ) [Flags changed]
+[ 62 of 190] Compiling Data.SBV.Internals ( Data/SBV/Internals.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Internals.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Internals.dyn_o ) [Flags changed]
+[ 63 of 190] Compiling Data.SBV.Client.BaseIO ( Data/SBV/Client/BaseIO.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Client/BaseIO.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Client/BaseIO.dyn_o ) [Flags changed]
+[ 64 of 190] Compiling Data.SBV         ( Data/SBV.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV.dyn_o ) [Flags changed]
+[ 65 of 190] Compiling Data.SBV.Tools.WeakestPreconditions ( Data/SBV/Tools/WeakestPreconditions.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/WeakestPreconditions.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/WeakestPreconditions.dyn_o ) [Flags changed]
+[ 66 of 190] Compiling Data.SBV.Tools.Range ( Data/SBV/Tools/Range.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Range.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Range.dyn_o ) [Flags changed]
+[ 67 of 190] Compiling Data.SBV.Tools.Induction ( Data/SBV/Tools/Induction.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Induction.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/Induction.dyn_o ) [Flags changed]
+[ 68 of 190] Compiling Data.SBV.Tools.BVOptimize ( Data/SBV/Tools/BVOptimize.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/BVOptimize.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/BVOptimize.dyn_o ) [Flags changed]
+[ 69 of 190] Compiling Data.SBV.Tools.BMC ( Data/SBV/Tools/BMC.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/BMC.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Tools/BMC.dyn_o ) [Flags changed]
+[ 70 of 190] Compiling Data.SBV.TP.TP   ( Data/SBV/TP/TP.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/TP.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/TP.dyn_o ) [Flags changed]
+Data/SBV/TP/TP.hs:252:60: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+252 |         trimBN level bn | level > 1, 1 : _ <- reverse bn = init bn
+    |                                                            ^^^^
+
+Data/SBV/TP/TP.hs:275:134: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+275 |                                       1 : _ -> liftIO $ do tab <- startTP cfg False "Step" level (TPProofStep False nm [] (map show (init bn)))
+    |                                                                                                                                      ^^^^
+
+Data/SBV/TP/TP.hs:344:37: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+344 |                xs -> do let qcArg = last xs -- take the last one if multiple exists. Why not?
+    |                                     ^^^^
+
+Data/SBV/TP/TP.hs:788:27: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+788 |                's':_:_ -> init n
+    |                           ^^^^
+
+[ 71 of 190] Compiling Data.SBV.TP      ( Data/SBV/TP.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP.dyn_o ) [Flags changed]
+[ 72 of 190] Compiling Data.SBV.TP.List ( Data/SBV/TP/List.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/List.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/TP/List.dyn_o ) [Flags changed]
+[ 73 of 190] Compiling Data.SBV.Dynamic ( Data/SBV/Dynamic.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Dynamic.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Data/SBV/Dynamic.dyn_o ) [Flags changed]
+[ 74 of 190] Compiling Documentation.SBV.Examples.BitPrecise.BitTricks ( Documentation/SBV/Examples/BitPrecise/BitTricks.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/BitTricks.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/BitTricks.dyn_o ) [Flags changed]
+[ 75 of 190] Compiling Documentation.SBV.Examples.BitPrecise.BrokenSearch ( Documentation/SBV/Examples/BitPrecise/BrokenSearch.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/BrokenSearch.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/BrokenSearch.dyn_o ) [Flags changed]
+[ 76 of 190] Compiling Documentation.SBV.Examples.BitPrecise.Legato ( Documentation/SBV/Examples/BitPrecise/Legato.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/Legato.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/Legato.dyn_o ) [Flags changed]
+[ 77 of 190] Compiling Documentation.SBV.Examples.BitPrecise.MergeSort ( Documentation/SBV/Examples/BitPrecise/MergeSort.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/MergeSort.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/MergeSort.dyn_o ) [Flags changed]
+[ 78 of 190] Compiling Documentation.SBV.Examples.BitPrecise.PEXT_PDEP ( Documentation/SBV/Examples/BitPrecise/PEXT_PDEP.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/PEXT_PDEP.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/PEXT_PDEP.dyn_o ) [Flags changed]
+[ 79 of 190] Compiling Documentation.SBV.Examples.BitPrecise.PrefixSum ( Documentation/SBV/Examples/BitPrecise/PrefixSum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/PrefixSum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/BitPrecise/PrefixSum.dyn_o ) [Flags changed]
+Documentation/SBV/Examples/BitPrecise/PrefixSum.hs:77:26: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+77 |          rsh xs = zero : init xs
+   |                          ^^^^
+
+[ 80 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.AddSub ( Documentation/SBV/Examples/CodeGeneration/AddSub.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/AddSub.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/AddSub.dyn_o ) [Flags changed]
+[ 81 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.CRC_USB5 ( Documentation/SBV/Examples/CodeGeneration/CRC_USB5.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/CRC_USB5.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/CRC_USB5.dyn_o ) [Flags changed]
+[ 82 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.Fibonacci ( Documentation/SBV/Examples/CodeGeneration/Fibonacci.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/Fibonacci.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/Fibonacci.dyn_o ) [Flags changed]
+[ 83 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.GCD ( Documentation/SBV/Examples/CodeGeneration/GCD.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/GCD.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/GCD.dyn_o ) [Flags changed]
+[ 84 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.PopulationCount ( Documentation/SBV/Examples/CodeGeneration/PopulationCount.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/PopulationCount.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/PopulationCount.dyn_o ) [Flags changed]
+[ 85 of 190] Compiling Documentation.SBV.Examples.CodeGeneration.Uninterpreted ( Documentation/SBV/Examples/CodeGeneration/Uninterpreted.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/Uninterpreted.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/CodeGeneration/Uninterpreted.dyn_o ) [Flags changed]
+[ 86 of 190] Compiling Documentation.SBV.Examples.Crypto.AES ( Documentation/SBV/Examples/Crypto/AES.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/AES.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/AES.dyn_o ) [Flags changed]
+[ 87 of 190] Compiling Documentation.SBV.Examples.Crypto.Prince ( Documentation/SBV/Examples/Crypto/Prince.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/Prince.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/Prince.dyn_o ) [Flags changed]
+[ 88 of 190] Compiling Documentation.SBV.Examples.Crypto.RC4 ( Documentation/SBV/Examples/Crypto/RC4.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/RC4.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/RC4.dyn_o ) [Flags changed]
+[ 89 of 190] Compiling Documentation.SBV.Examples.Crypto.SHA ( Documentation/SBV/Examples/Crypto/SHA.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/SHA.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Crypto/SHA.dyn_o ) [Flags changed]
+[ 90 of 190] Compiling Documentation.SBV.Examples.DeltaSat.DeltaSat ( Documentation/SBV/Examples/DeltaSat/DeltaSat.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/DeltaSat/DeltaSat.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/DeltaSat/DeltaSat.dyn_o ) [Flags changed]
+[ 91 of 190] Compiling Documentation.SBV.Examples.Existentials.Diophantine ( Documentation/SBV/Examples/Existentials/Diophantine.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Existentials/Diophantine.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Existentials/Diophantine.dyn_o ) [Flags changed]
+[ 92 of 190] Compiling Documentation.SBV.Examples.Lists.BoundedMutex ( Documentation/SBV/Examples/Lists/BoundedMutex.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/BoundedMutex.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/BoundedMutex.dyn_o ) [Flags changed]
+[ 93 of 190] Compiling Documentation.SBV.Examples.Lists.CountOutAndTransfer ( Documentation/SBV/Examples/Lists/CountOutAndTransfer.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/CountOutAndTransfer.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/CountOutAndTransfer.dyn_o ) [Flags changed]
+[ 94 of 190] Compiling Documentation.SBV.Examples.Lists.Fibonacci ( Documentation/SBV/Examples/Lists/Fibonacci.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/Fibonacci.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Lists/Fibonacci.dyn_o ) [Flags changed]
+[ 95 of 190] Compiling Documentation.SBV.Examples.Misc.Auxiliary ( Documentation/SBV/Examples/Misc/Auxiliary.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Auxiliary.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Auxiliary.dyn_o ) [Flags changed]
+[ 96 of 190] Compiling Documentation.SBV.Examples.Misc.Definitions ( Documentation/SBV/Examples/Misc/Definitions.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Definitions.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Definitions.dyn_o ) [Flags changed]
+[ 97 of 190] Compiling Documentation.SBV.Examples.Misc.Enumerate ( Documentation/SBV/Examples/Misc/Enumerate.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Enumerate.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Enumerate.dyn_o ) [Flags changed]
+[ 98 of 190] Compiling Documentation.SBV.Examples.Misc.FirstOrderLogic ( Documentation/SBV/Examples/Misc/FirstOrderLogic.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/FirstOrderLogic.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/FirstOrderLogic.dyn_o ) [Flags changed]
+[ 99 of 190] Compiling Documentation.SBV.Examples.Misc.Floating ( Documentation/SBV/Examples/Misc/Floating.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Floating.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Floating.dyn_o ) [Flags changed]
+[100 of 190] Compiling Documentation.SBV.Examples.Misc.LambdaArray ( Documentation/SBV/Examples/Misc/LambdaArray.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/LambdaArray.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/LambdaArray.dyn_o ) [Flags changed]
+[101 of 190] Compiling Documentation.SBV.Examples.Misc.ModelExtract ( Documentation/SBV/Examples/Misc/ModelExtract.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/ModelExtract.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/ModelExtract.dyn_o ) [Flags changed]
+[102 of 190] Compiling Documentation.SBV.Examples.Misc.NestedArray ( Documentation/SBV/Examples/Misc/NestedArray.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/NestedArray.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/NestedArray.dyn_o ) [Flags changed]
+[103 of 190] Compiling Documentation.SBV.Examples.Misc.Newtypes ( Documentation/SBV/Examples/Misc/Newtypes.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Newtypes.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Newtypes.dyn_o ) [Flags changed]
+[104 of 190] Compiling Documentation.SBV.Examples.Misc.NoDiv0 ( Documentation/SBV/Examples/Misc/NoDiv0.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/NoDiv0.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/NoDiv0.dyn_o ) [Flags changed]
+[105 of 190] Compiling Documentation.SBV.Examples.Misc.Polynomials ( Documentation/SBV/Examples/Misc/Polynomials.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Polynomials.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Polynomials.dyn_o ) [Flags changed]
+[106 of 190] Compiling Documentation.SBV.Examples.Misc.ProgramPaths ( Documentation/SBV/Examples/Misc/ProgramPaths.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/ProgramPaths.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/ProgramPaths.dyn_o ) [Flags changed]
+[107 of 190] Compiling Documentation.SBV.Examples.Misc.SetAlgebra ( Documentation/SBV/Examples/Misc/SetAlgebra.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/SetAlgebra.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/SetAlgebra.dyn_o ) [Flags changed]
+[108 of 190] Compiling Documentation.SBV.Examples.Misc.SoftConstrain ( Documentation/SBV/Examples/Misc/SoftConstrain.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/SoftConstrain.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/SoftConstrain.dyn_o ) [Flags changed]
+[109 of 190] Compiling Documentation.SBV.Examples.Misc.Tuple ( Documentation/SBV/Examples/Misc/Tuple.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Tuple.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Misc/Tuple.dyn_o ) [Flags changed]
+[110 of 190] Compiling Documentation.SBV.Examples.Optimization.Enumerate ( Documentation/SBV/Examples/Optimization/Enumerate.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/Enumerate.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/Enumerate.dyn_o ) [Flags changed]
+[111 of 190] Compiling Documentation.SBV.Examples.Optimization.ExtField ( Documentation/SBV/Examples/Optimization/ExtField.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/ExtField.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/ExtField.dyn_o ) [Flags changed]
+[112 of 190] Compiling Documentation.SBV.Examples.Optimization.LinearOpt ( Documentation/SBV/Examples/Optimization/LinearOpt.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/LinearOpt.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/LinearOpt.dyn_o ) [Flags changed]
+[113 of 190] Compiling Documentation.SBV.Examples.Optimization.Production ( Documentation/SBV/Examples/Optimization/Production.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/Production.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/Production.dyn_o ) [Flags changed]
+[114 of 190] Compiling Documentation.SBV.Examples.Optimization.VM ( Documentation/SBV/Examples/Optimization/VM.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/VM.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Optimization/VM.dyn_o ) [Flags changed]
+[115 of 190] Compiling Documentation.SBV.Examples.ProofTools.AddHorn ( Documentation/SBV/Examples/ProofTools/AddHorn.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/AddHorn.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/AddHorn.dyn_o ) [Flags changed]
+[116 of 190] Compiling Documentation.SBV.Examples.ProofTools.BMC ( Documentation/SBV/Examples/ProofTools/BMC.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/BMC.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/BMC.dyn_o ) [Flags changed]
+[117 of 190] Compiling Documentation.SBV.Examples.ProofTools.Fibonacci ( Documentation/SBV/Examples/ProofTools/Fibonacci.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Fibonacci.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Fibonacci.dyn_o ) [Flags changed]
+[118 of 190] Compiling Documentation.SBV.Examples.ProofTools.Strengthen ( Documentation/SBV/Examples/ProofTools/Strengthen.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Strengthen.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Strengthen.dyn_o ) [Flags changed]
+[119 of 190] Compiling Documentation.SBV.Examples.ProofTools.Sum ( Documentation/SBV/Examples/ProofTools/Sum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Sum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/ProofTools/Sum.dyn_o ) [Flags changed]
+[120 of 190] Compiling Documentation.SBV.Examples.Puzzles.AOC_2021_24 ( Documentation/SBV/Examples/Puzzles/AOC_2021_24.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/AOC_2021_24.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/AOC_2021_24.dyn_o ) [Flags changed]
+[121 of 190] Compiling Documentation.SBV.Examples.Puzzles.Birthday ( Documentation/SBV/Examples/Puzzles/Birthday.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Birthday.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Birthday.dyn_o ) [Flags changed]
+[122 of 190] Compiling Documentation.SBV.Examples.Puzzles.Coins ( Documentation/SBV/Examples/Puzzles/Coins.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Coins.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Coins.dyn_o ) [Flags changed]
+[123 of 190] Compiling Documentation.SBV.Examples.Puzzles.Counts ( Documentation/SBV/Examples/Puzzles/Counts.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Counts.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Counts.dyn_o ) [Flags changed]
+Documentation/SBV/Examples/Puzzles/Counts.hs:54:22: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+54 | puzzle cnt = cnt .== last css
+   |                      ^^^^
+
+[124 of 190] Compiling Documentation.SBV.Examples.Puzzles.DieHard ( Documentation/SBV/Examples/Puzzles/DieHard.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/DieHard.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/DieHard.dyn_o ) [Flags changed]
+[125 of 190] Compiling Documentation.SBV.Examples.Puzzles.DogCatMouse ( Documentation/SBV/Examples/Puzzles/DogCatMouse.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/DogCatMouse.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/DogCatMouse.dyn_o ) [Flags changed]
+[126 of 190] Compiling Documentation.SBV.Examples.Puzzles.Drinker ( Documentation/SBV/Examples/Puzzles/Drinker.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Drinker.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Drinker.dyn_o ) [Flags changed]
+[127 of 190] Compiling Documentation.SBV.Examples.Puzzles.Euler185 ( Documentation/SBV/Examples/Puzzles/Euler185.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Euler185.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Euler185.dyn_o ) [Flags changed]
+[128 of 190] Compiling Documentation.SBV.Examples.Puzzles.Fish ( Documentation/SBV/Examples/Puzzles/Fish.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Fish.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Fish.dyn_o ) [Flags changed]
+[129 of 190] Compiling Documentation.SBV.Examples.Puzzles.Garden ( Documentation/SBV/Examples/Puzzles/Garden.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Garden.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Garden.dyn_o ) [Flags changed]
+[130 of 190] Compiling Documentation.SBV.Examples.Puzzles.HexPuzzle ( Documentation/SBV/Examples/Puzzles/HexPuzzle.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/HexPuzzle.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/HexPuzzle.dyn_o ) [Flags changed]
+[131 of 190] Compiling Documentation.SBV.Examples.Puzzles.Jugs ( Documentation/SBV/Examples/Puzzles/Jugs.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Jugs.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Jugs.dyn_o ) [Flags changed]
+[132 of 190] Compiling Documentation.SBV.Examples.Puzzles.KnightsAndKnaves ( Documentation/SBV/Examples/Puzzles/KnightsAndKnaves.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/KnightsAndKnaves.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/KnightsAndKnaves.dyn_o ) [Flags changed]
+[133 of 190] Compiling Documentation.SBV.Examples.Puzzles.LadyAndTigers ( Documentation/SBV/Examples/Puzzles/LadyAndTigers.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/LadyAndTigers.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/LadyAndTigers.dyn_o ) [Flags changed]
+[134 of 190] Compiling Documentation.SBV.Examples.Puzzles.MagicSquare ( Documentation/SBV/Examples/Puzzles/MagicSquare.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/MagicSquare.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/MagicSquare.dyn_o ) [Flags changed]
+[135 of 190] Compiling Documentation.SBV.Examples.Puzzles.Murder ( Documentation/SBV/Examples/Puzzles/Murder.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Murder.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Murder.dyn_o ) [Flags changed]
+[136 of 190] Compiling Documentation.SBV.Examples.Puzzles.NQueens ( Documentation/SBV/Examples/Puzzles/NQueens.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/NQueens.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/NQueens.dyn_o ) [Flags changed]
+[137 of 190] Compiling Documentation.SBV.Examples.Puzzles.Newspaper ( Documentation/SBV/Examples/Puzzles/Newspaper.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Newspaper.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Newspaper.dyn_o ) [Flags changed]
+[138 of 190] Compiling Documentation.SBV.Examples.Puzzles.Orangutans ( Documentation/SBV/Examples/Puzzles/Orangutans.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Orangutans.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Orangutans.dyn_o ) [Flags changed]
+[139 of 190] Compiling Documentation.SBV.Examples.Puzzles.Rabbits ( Documentation/SBV/Examples/Puzzles/Rabbits.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Rabbits.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Rabbits.dyn_o ) [Flags changed]
+[140 of 190] Compiling Documentation.SBV.Examples.Puzzles.SendMoreMoney ( Documentation/SBV/Examples/Puzzles/SendMoreMoney.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/SendMoreMoney.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/SendMoreMoney.dyn_o ) [Flags changed]
+[141 of 190] Compiling Documentation.SBV.Examples.Puzzles.Sudoku ( Documentation/SBV/Examples/Puzzles/Sudoku.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Sudoku.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Sudoku.dyn_o ) [Flags changed]
+[142 of 190] Compiling Documentation.SBV.Examples.Puzzles.Tower ( Documentation/SBV/Examples/Puzzles/Tower.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Tower.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/Tower.dyn_o ) [Flags changed]
+[143 of 190] Compiling Documentation.SBV.Examples.Puzzles.U2Bridge ( Documentation/SBV/Examples/Puzzles/U2Bridge.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/U2Bridge.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Puzzles/U2Bridge.dyn_o ) [Flags changed]
+Documentation/SBV/Examples/Puzzles/U2Bridge.hs:204:15: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘last’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+    |
+204 |         end = last states
+    |               ^^^^
+
+[144 of 190] Compiling Documentation.SBV.Examples.Queries.Abducts ( Documentation/SBV/Examples/Queries/Abducts.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Abducts.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Abducts.dyn_o ) [Flags changed]
+[145 of 190] Compiling Documentation.SBV.Examples.Queries.AllSat ( Documentation/SBV/Examples/Queries/AllSat.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/AllSat.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/AllSat.dyn_o ) [Flags changed]
+[146 of 190] Compiling Documentation.SBV.Examples.Queries.CaseSplit ( Documentation/SBV/Examples/Queries/CaseSplit.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/CaseSplit.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/CaseSplit.dyn_o ) [Flags changed]
+[147 of 190] Compiling Documentation.SBV.Examples.Queries.Concurrency ( Documentation/SBV/Examples/Queries/Concurrency.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Concurrency.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Concurrency.dyn_o ) [Flags changed]
+[148 of 190] Compiling Documentation.SBV.Examples.Queries.Enums ( Documentation/SBV/Examples/Queries/Enums.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Enums.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Enums.dyn_o ) [Flags changed]
+[149 of 190] Compiling Documentation.SBV.Examples.Queries.FourFours ( Documentation/SBV/Examples/Queries/FourFours.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/FourFours.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/FourFours.dyn_o ) [Flags changed]
+Documentation/SBV/Examples/Queries/FourFours.hs:90:26: warning: [GHC-63394] [-Wx-partial]
+    In the use of ‘init’
+    (imported from Prelude, but defined in GHC.Internal.List):
+    "This is a partial function, it throws an error on empty lists. Use 'Data.List.unsnoc' instead. Consider refactoring to use "Data.List.NonEmpty"."
+   |
+90 |           where splits = init $ drop 1 $ zip (inits xs) (tails xs)
+   |                          ^^^^
+
+[150 of 190] Compiling Documentation.SBV.Examples.Queries.GuessNumber ( Documentation/SBV/Examples/Queries/GuessNumber.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/GuessNumber.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/GuessNumber.dyn_o ) [Flags changed]
+[151 of 190] Compiling Documentation.SBV.Examples.Queries.Interpolants ( Documentation/SBV/Examples/Queries/Interpolants.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Interpolants.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/Interpolants.dyn_o ) [Flags changed]
+[152 of 190] Compiling Documentation.SBV.Examples.Queries.UnsatCore ( Documentation/SBV/Examples/Queries/UnsatCore.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/UnsatCore.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Queries/UnsatCore.dyn_o ) [Flags changed]
+[153 of 190] Compiling Documentation.SBV.Examples.Strings.RegexCrossword ( Documentation/SBV/Examples/Strings/RegexCrossword.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Strings/RegexCrossword.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Strings/RegexCrossword.dyn_o ) [Flags changed]
+[154 of 190] Compiling Documentation.SBV.Examples.Strings.SQLInjection ( Documentation/SBV/Examples/Strings/SQLInjection.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Strings/SQLInjection.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Strings/SQLInjection.dyn_o ) [Flags changed]
+[155 of 190] Compiling Documentation.SBV.Examples.TP.Basics ( Documentation/SBV/Examples/TP/Basics.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Basics.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Basics.dyn_o ) [Flags changed]
+[156 of 190] Compiling Documentation.SBV.Examples.TP.BinarySearch ( Documentation/SBV/Examples/TP/BinarySearch.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/BinarySearch.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/BinarySearch.dyn_o ) [Flags changed]
+[157 of 190] Compiling Documentation.SBV.Examples.TP.CaseSplit ( Documentation/SBV/Examples/TP/CaseSplit.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/CaseSplit.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/CaseSplit.dyn_o ) [Flags changed]
+[158 of 190] Compiling Documentation.SBV.Examples.TP.Fibonacci ( Documentation/SBV/Examples/TP/Fibonacci.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Fibonacci.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Fibonacci.dyn_o ) [Flags changed]
+[159 of 190] Compiling Documentation.SBV.Examples.TP.Kleene ( Documentation/SBV/Examples/TP/Kleene.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Kleene.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Kleene.dyn_o ) [Flags changed]
+[160 of 190] Compiling Documentation.SBV.Examples.TP.Majority ( Documentation/SBV/Examples/TP/Majority.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Majority.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Majority.dyn_o ) [Flags changed]
+[161 of 190] Compiling Documentation.SBV.Examples.TP.McCarthy91 ( Documentation/SBV/Examples/TP/McCarthy91.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/McCarthy91.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/McCarthy91.dyn_o ) [Flags changed]
+[162 of 190] Compiling Documentation.SBV.Examples.TP.Numeric ( Documentation/SBV/Examples/TP/Numeric.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Numeric.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Numeric.dyn_o ) [Flags changed]
+[163 of 190] Compiling Documentation.SBV.Examples.TP.PowerMod ( Documentation/SBV/Examples/TP/PowerMod.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/PowerMod.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/PowerMod.dyn_o ) [Flags changed]
+[164 of 190] Compiling Documentation.SBV.Examples.TP.RevAcc ( Documentation/SBV/Examples/TP/RevAcc.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/RevAcc.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/RevAcc.dyn_o ) [Flags changed]
+[165 of 190] Compiling Documentation.SBV.Examples.TP.Reverse ( Documentation/SBV/Examples/TP/Reverse.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Reverse.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Reverse.dyn_o ) [Flags changed]
+[166 of 190] Compiling Documentation.SBV.Examples.TP.ShefferStroke ( Documentation/SBV/Examples/TP/ShefferStroke.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/ShefferStroke.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/ShefferStroke.dyn_o ) [Flags changed]
+[167 of 190] Compiling Documentation.SBV.Examples.TP.SortHelpers ( Documentation/SBV/Examples/TP/SortHelpers.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/SortHelpers.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/SortHelpers.dyn_o ) [Flags changed]
+[168 of 190] Compiling Documentation.SBV.Examples.TP.QuickSort ( Documentation/SBV/Examples/TP/QuickSort.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/QuickSort.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/QuickSort.dyn_o ) [Flags changed]
+[169 of 190] Compiling Documentation.SBV.Examples.TP.MergeSort ( Documentation/SBV/Examples/TP/MergeSort.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/MergeSort.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/MergeSort.dyn_o ) [Flags changed]
+[170 of 190] Compiling Documentation.SBV.Examples.TP.InsertionSort ( Documentation/SBV/Examples/TP/InsertionSort.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/InsertionSort.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/InsertionSort.dyn_o ) [Flags changed]
+[171 of 190] Compiling Documentation.SBV.Examples.TP.Sqrt2IsIrrational ( Documentation/SBV/Examples/TP/Sqrt2IsIrrational.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Sqrt2IsIrrational.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Sqrt2IsIrrational.dyn_o ) [Flags changed]
+[172 of 190] Compiling Documentation.SBV.Examples.TP.StrongInduction ( Documentation/SBV/Examples/TP/StrongInduction.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/StrongInduction.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/StrongInduction.dyn_o ) [Flags changed]
+[173 of 190] Compiling Documentation.SBV.Examples.TP.SumReverse ( Documentation/SBV/Examples/TP/SumReverse.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/SumReverse.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/SumReverse.dyn_o ) [Flags changed]
+[174 of 190] Compiling Documentation.SBV.Examples.TP.Tao ( Documentation/SBV/Examples/TP/Tao.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Tao.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/TP/Tao.dyn_o ) [Flags changed]
+[175 of 190] Compiling Documentation.SBV.Examples.Transformers.SymbolicEval ( Documentation/SBV/Examples/Transformers/SymbolicEval.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Transformers/SymbolicEval.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Transformers/SymbolicEval.dyn_o ) [Flags changed]
+[176 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.AUF ( Documentation/SBV/Examples/Uninterpreted/AUF.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/AUF.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/AUF.dyn_o ) [Flags changed]
+[177 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.Deduce ( Documentation/SBV/Examples/Uninterpreted/Deduce.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Deduce.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Deduce.dyn_o ) [Flags changed]
+[178 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.Function ( Documentation/SBV/Examples/Uninterpreted/Function.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Function.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Function.dyn_o ) [Flags changed]
+[179 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.Multiply ( Documentation/SBV/Examples/Uninterpreted/Multiply.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Multiply.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Multiply.dyn_o ) [Flags changed]
+[180 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.Shannon ( Documentation/SBV/Examples/Uninterpreted/Shannon.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Shannon.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Shannon.dyn_o ) [Flags changed]
+[181 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.Sort ( Documentation/SBV/Examples/Uninterpreted/Sort.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Sort.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/Sort.dyn_o ) [Flags changed]
+[182 of 190] Compiling Documentation.SBV.Examples.Uninterpreted.UISortAllSat ( Documentation/SBV/Examples/Uninterpreted/UISortAllSat.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/UISortAllSat.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/Uninterpreted/UISortAllSat.dyn_o ) [Flags changed]
+[183 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.Append ( Documentation/SBV/Examples/WeakestPreconditions/Append.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Append.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Append.dyn_o ) [Flags changed]
+[184 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.Basics ( Documentation/SBV/Examples/WeakestPreconditions/Basics.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Basics.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Basics.dyn_o ) [Flags changed]
+[185 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.Fib ( Documentation/SBV/Examples/WeakestPreconditions/Fib.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Fib.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Fib.dyn_o ) [Flags changed]
+[186 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.GCD ( Documentation/SBV/Examples/WeakestPreconditions/GCD.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/GCD.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/GCD.dyn_o ) [Flags changed]
+[187 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.IntDiv ( Documentation/SBV/Examples/WeakestPreconditions/IntDiv.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/IntDiv.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/IntDiv.dyn_o ) [Flags changed]
+[188 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.IntSqrt ( Documentation/SBV/Examples/WeakestPreconditions/IntSqrt.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/IntSqrt.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/IntSqrt.dyn_o ) [Flags changed]
+[189 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.Length ( Documentation/SBV/Examples/WeakestPreconditions/Length.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Length.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Length.dyn_o ) [Flags changed]
+[190 of 190] Compiling Documentation.SBV.Examples.WeakestPreconditions.Sum ( Documentation/SBV/Examples/WeakestPreconditions/Sum.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Sum.o, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/noopt/build/Documentation/SBV/Examples/WeakestPreconditions/Sum.dyn_o ) [Flags changed]
+Configuring executable 'sbv-wasm-demo' for sbv-12.1...
+Warning: [git-protocol] Cloning over git:// might lead to an arbitrary code
+execution vulnerability. Furthermore, popular forges like GitHub do not
+support it. Use https:// or ssh:// instead.
+Preprocessing executable 'sbv-wasm-demo' for sbv-12.1...
+Building executable 'sbv-wasm-demo' for sbv-12.1...
+[1 of 1] Compiling Main             ( wasm/Main.hs, dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/x/sbv-wasm-demo/noopt/build/sbv-wasm-demo/sbv-wasm-demo-tmp/Main.o ) [Source file changed]
+[2 of 2] Linking dist-wasm/build/wasm32-wasi/ghc-9.15.20260331/sbv-12.1/x/sbv-wasm-demo/noopt/build/sbv-wasm-demo/sbv-wasm-demo.wasm [Objects changed]
+wasm-ld: warning: function signature mismatch: bf_set_ui
+>>> defined as (i32, i64) -> void in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(LibBF.o)
+>>> defined as (i32, i64) -> i32 in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(libbf.o)
+
+wasm-ld: warning: function signature mismatch: bf_set_si
+>>> defined as (i32, i64) -> void in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(LibBF.o)
+>>> defined as (i32, i64) -> i32 in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(libbf.o)
+
+wasm-ld: warning: function signature mismatch: bf_set
+>>> defined as (i32, i32) -> void in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(LibBF.o)
+>>> defined as (i32, i32) -> i32 in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(libbf.o)
+
+wasm-ld: warning: function signature mismatch: bf_set_float64
+>>> defined as (i32, f64) -> void in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(LibBF.o)
+>>> defined as (i32, f64) -> i32 in /home/t/.cabal/store/ghc-9.15.20260331/libBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5/lib/libHSlibBF-0.6.8-00e626779226457342096816eee600fc8ef5e64b8a406489a00f80922f4420b5.a(libbf.o)
