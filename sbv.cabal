@@ -99,6 +99,18 @@ Library
     CPP-Options: -DDOCTEST
 
   default-language: Haskell2010
+
+  -- Common dependency set, shared by both the native and the WebAssembly
+  -- (browser) targets. Note that 'libBF' lives here, not in a conditional: it is
+  -- retained on BOTH targets. On the WebAssembly target its bundled portable C
+  -- sources are compiled by the wasm clang toolchain, so SBV's
+  -- 'FloatingPoint'/'FP' type and the IEEE/arbitrary-precision floating-point
+  -- theories remain present in the browser build (Requirements 10.1, 10.5).
+  --
+  -- 'process' and 'directory' are intentionally NOT listed here; they are added
+  -- only in the native (else) branch of the arch(wasm32) conditional below, so
+  -- the browser path carries no compile-time dependency on System.Process /
+  -- System.Directory (Requirements 12.1, 12.2, 12.3).
   build-depends   : QuickCheck
                   , array
                   , async
@@ -107,14 +119,12 @@ Library
                   , cryptohash-sha512
                   , containers
                   , deepseq
-                  , directory
                   , filepath
                   , haskell-src-exts
                   , haskell-src-meta
                   , libBF
                   , mtl
                   , pretty
-                  , process
                   , random
                   , syb
                   , template-haskell
@@ -124,12 +134,37 @@ Library
                   , transformers
                   , tree-view
                   , uniplate
+
+  -- Code-path selection by architecture detection (Requirements 12.5, 12.6,
+  -- 15.3, 15.4). All build settings that differ between the native and browser
+  -- targets are encoded here in the cabal file, NOT on the command line, so that
+  -- the standard, unmodified invocations reproduce the intended behavior:
+  --   * native target:  cabal build
+  --   * wasm target:     wasm32-wasi-cabal build
+  -- with no injected optimization / --ghc-options flags (Requirement 15).
+  if arch(wasm32)
+    -- Browser path: define SBV_WASM so the '#ifdef SBV_WASM' source seams take
+    -- the browser code path. 'process' and 'directory' are deliberately omitted
+    -- from this branch; 'libBF' is kept (it is in the common build-depends above
+    -- and its bundled C is compiled for wasm). The four browser modules
+    -- (Data.SBV.SMT.WasmBridge, Data.SBV.SMT.BrowserEngine,
+    -- Data.SBV.Provers.Z3Wasm, Data.SBV.SMT.TranscriptSink) are listed
+    -- unconditionally in the module sections below, so they are present here too.
+    cpp-options: -DSBV_WASM
+  else
+    -- Native path: keep the process-based engine's OS dependencies exactly as
+    -- before, so native solving behavior is byte-for-byte identical
+    -- (Requirements 12.5, 12.6).
+    build-depends: process
+                 , directory
+
   Exposed-modules : Data.SBV
                   , Data.SBV.Control
                   , Data.SBV.Dynamic
                   , Data.SBV.Either
                   , Data.SBV.Float
                   , Data.SBV.Internals
+                  , Data.SBV.SMT.WasmBridge
                   , Data.SBV.List
                   , Data.SBV.Maybe
                   , Data.SBV.Rational
@@ -315,10 +350,12 @@ Library
                   , Data.SBV.Lambda
                   , Data.SBV.SCase
                   , Data.SBV.SEnum
+                  , Data.SBV.SMT.BrowserEngine
                   , Data.SBV.SMT.SMT
                   , Data.SBV.SMT.SMTLib
                   , Data.SBV.SMT.SMTLib2
                   , Data.SBV.SMT.SMTLibNames
+                  , Data.SBV.SMT.TranscriptSink
                   , Data.SBV.SMT.Utils
                   , Data.SBV.Provers.Prover
                   , Data.SBV.Provers.ABC
@@ -331,6 +368,7 @@ Library
                   , Data.SBV.Provers.OpenSMT
                   , Data.SBV.Provers.Yices
                   , Data.SBV.Provers.Z3
+                  , Data.SBV.Provers.Z3Wasm
                   , Data.SBV.Utils.CrackNum
                   , Data.SBV.Utils.ExtractIO
                   , Data.SBV.Utils.Numeric
@@ -363,9 +401,11 @@ Test-Suite SBVTest
                   , tasty-hunit
                   , tasty-quickcheck
                   , temporary
+                  , text
   hs-source-dirs  : SBVTestSuite
   main-is         : SBVTest.hs
   other-modules   : Utils.SBVTestFramework
+                  , Utils.MockBridge
                   , TestSuite.ADT.ADT
                   , TestSuite.ADT.Expr
                   , TestSuite.ADT.MutRec
@@ -484,6 +524,18 @@ Test-Suite SBVTest
                   , TestSuite.Uninterpreted.Uninterpreted
                   , TestSuite.Uninterpreted.EUFLogic
                   , TestSuite.CantTypeCheck.Misc
+                  , TestSuite.Wasm.SafeWithPaths
+                  , TestSuite.Wasm.ConcurrentRejection
+                  , TestSuite.Wasm.Z3WasmConfig
+                  , TestSuite.Wasm.TranscriptSink
+                  , TestSuite.Wasm.InitAtMostOnce
+                  , TestSuite.Wasm.QueryTimeout
+                  , TestSuite.Wasm.BridgeOrdering
+                  , TestSuite.Wasm.FailureSurfacing
+                  , TestSuite.Wasm.ResponseAccumulation
+                  , TestSuite.Wasm.ShortCircuit
+                  , TestSuite.Wasm.SessionState
+                  , TestSuite.Wasm.CleanupFidelity
 
 Test-Suite SBVConnections
     import          : common-settings

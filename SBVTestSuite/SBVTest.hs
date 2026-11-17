@@ -133,6 +133,18 @@ import qualified TestSuite.Uninterpreted.EUFLogic
 import qualified TestSuite.Uninterpreted.Function
 import qualified TestSuite.Uninterpreted.Sort
 import qualified TestSuite.Uninterpreted.Uninterpreted
+import qualified TestSuite.Wasm.SafeWithPaths
+import qualified TestSuite.Wasm.ConcurrentRejection
+import qualified TestSuite.Wasm.Z3WasmConfig
+import qualified TestSuite.Wasm.TranscriptSink
+import qualified TestSuite.Wasm.InitAtMostOnce
+import qualified TestSuite.Wasm.QueryTimeout
+import qualified TestSuite.Wasm.BridgeOrdering
+import qualified TestSuite.Wasm.FailureSurfacing
+import qualified TestSuite.Wasm.ResponseAccumulation
+import qualified TestSuite.Wasm.ShortCircuit
+import qualified TestSuite.Wasm.SessionState
+import qualified TestSuite.Wasm.CleanupFidelity
 
 main :: IO ()
 main = do sCaseTests <- TestSuite.CompileTests.SCase.tests
@@ -256,6 +268,18 @@ main = do sCaseTests <- TestSuite.CompileTests.SCase.tests
                       , TestSuite.Uninterpreted.Sort.tests
                       , TestSuite.Uninterpreted.Uninterpreted.tests
                       , TestSuite.Uninterpreted.EUFLogic.tests
+                      , TestSuite.Wasm.SafeWithPaths.tests
+                      , TestSuite.Wasm.ConcurrentRejection.tests
+                      , TestSuite.Wasm.Z3WasmConfig.tests
+                      , TestSuite.Wasm.TranscriptSink.tests
+                      , TestSuite.Wasm.InitAtMostOnce.tests
+                      , TestSuite.Wasm.QueryTimeout.tests
+                      , TestSuite.Wasm.BridgeOrdering.tests
+                      , TestSuite.Wasm.FailureSurfacing.tests
+                      , TestSuite.Wasm.ResponseAccumulation.tests
+                      , TestSuite.Wasm.ShortCircuit.tests
+                      , TestSuite.Wasm.SessionState.tests
+                      , TestSuite.Wasm.CleanupFidelity.tests
                       , sCaseTests
                       , pCaseTests
                       ]

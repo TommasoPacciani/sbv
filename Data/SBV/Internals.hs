@@ -73,6 +73,21 @@ module Data.SBV.Internals (
 
   -- * TP induction extras
   , HasInductionSchema(..), internalAxiom
+
+  -- * Source-location path reporting (shared by 'Data.SBV.safeWith')
+  , mkRelativeFor
+
+  -- * Browser-path concurrent-combinator rejection (shared with the WASM build)
+  , concurrentCombinatorRejection
+
+  -- * Browser-path failure surfacing (shared with the WASM build)
+  , browserFailureException, incompleteResponseFailure, SolverFailure(..)
+
+  -- * Transcript sink (shared by the native/browser transcript functions)
+  , TranscriptSink(..), emitStart, emitAppend
+
+  -- * S-expression accumulation (the leaf helper both engines import downward)
+  , parenDeficit, parseSExpr, SExpr(..)
   ) where
 
 import Control.Monad.IO.Class (MonadIO)
@@ -93,7 +108,16 @@ import Data.SBV.Compilers.CodeGen
 import Data.SBV.SMT.SMTLibNames
 import Data.SBV.SMT.SMT (genParse, showModel, SatModel(..))
 
-import Data.SBV.Provers.Prover (ProvableM, SatisfiableM)
+import Data.SBV.SMT.TranscriptSink (TranscriptSink(..), emitStart, emitAppend)
+
+import Data.SBV.SMT.BrowserEngine (browserFailureException, incompleteResponseFailure)
+import Data.SBV.SMT.WasmBridge    (SolverFailure(..))
+
+import Data.SBV.Utils.SExpr (parenDeficit, parseSExpr, SExpr(..))
+
+import Data.SBV.Provers.Prover (ProvableM, SatisfiableM, concurrentCombinatorRejection)
+
+import Data.SBV.Utils.Lib (mkRelativeFor)
 
 import Data.SBV.Utils.Numeric
 

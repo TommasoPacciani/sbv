@@ -24,6 +24,7 @@ module Data.SBV.Utils.Lib ( mlift2, mlift3, mlift4, mlift5, mlift6, mlift7, mlif
                           , unQuote, unBar, nameSupply
                           , atProxy
                           , mapToSortedList
+                          , mkRelativeFor
                           ,   curry2,   curry3,   curry4,   curry5,   curry6,   curry7,   curry8,   curry9,   curry10,   curry11,   curry12
                           , uncurry2, uncurry3, uncurry4, uncurry5, uncurry6, uncurry7, uncurry8, uncurry9, uncurry10, uncurry11, uncurry12
                           )
@@ -290,3 +291,23 @@ uncurry12 fn (a, b, c, d, e, f, g, h, i, j, k, l) = fn a b c d e f g h i j k l
 -- that determines output order.
 mapToSortedList :: Ord v => Map.Map k v -> [(v, k)]
 mapToSortedList = sortBy (comparing fst) . map (\(a, b) -> (b, a)) . Map.toList
+
+-- | Make a source-location file path relative to a current working directory, if one is
+-- available. This is the shared path-reporting contract used by 'Data.SBV.safeWith':
+--
+--   * On the native path a current working directory /is/ available (@'Just' cwd@), and a
+--     path that begins with that directory is reported relative to it (the leading @cwd@
+--     prefix is stripped); any other path is left unchanged.
+--
+--   * On the browser (WASM) path there is no operating-system current working directory to
+--     relativize against (@'Nothing'@), so the path is reported /unmodified/ - i.e.
+--     @'mkRelativeFor' 'Nothing'@ is the identity. In particular no @cwd@ prefix is ever
+--     stripped and 'System.Directory.getCurrentDirectory' is never consulted.
+--
+-- Routing both 'Data.SBV.safeWith' CPP branches through this single function keeps the two
+-- behaviours in one place and makes the contract testable on a stock native GHC.
+mkRelativeFor :: Maybe FilePath -> FilePath -> FilePath
+mkRelativeFor Nothing    path = path
+mkRelativeFor (Just cwd) path
+  | cwd `isPrefixOf` path = drop (length cwd) path
+  | True                  = path
